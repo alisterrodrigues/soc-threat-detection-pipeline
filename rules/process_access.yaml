@@ -1,0 +1,56 @@
+rules:
+  - id: "PA-001"
+    name: "LSASS Memory Access"
+    description: "Detects any process opening a handle to lsass.exe — primary indicator of credential dumping tools such as Mimikatz, ProcDump, and similar"
+    severity: critical
+    mitre_technique: "T1003.001"
+    mitre_tactic: "Credential Access"
+    event_id: 10
+    conditions:
+      - field: "TargetImage"
+        operator: endswith
+        value: "lsass.exe"
+        case_insensitive: true
+    logic: AND
+    false_positive_notes: "AV, EDR, and backup agents legitimately access lsass. Build an allowlist of known SourceImage paths for your environment."
+    tuning_tag: "lsass_access"
+
+  - id: "PA-002"
+    name: "Suspicious Access Mask on LSASS"
+    description: "Detects high-privilege or Mimikatz-specific access masks requested against lsass.exe — 0x1010, 0x1410, and 0x1fffff are characteristic of credential dumping tools"
+    severity: critical
+    mitre_technique: "T1003.001"
+    mitre_tactic: "Credential Access"
+    event_id: 10
+    conditions:
+      - field: "TargetImage"
+        operator: endswith
+        value: "lsass.exe"
+        case_insensitive: true
+      - field: "GrantedAccess"
+        operator: regex
+        value: "0x(1010|1410|1fffff|143a)"
+        case_insensitive: true
+    logic: AND
+    false_positive_notes: "Some legitimate security products use these masks. Correlate SourceImage against a known-good allowlist before escalating."
+    tuning_tag: "lsass_suspicious_access_mask"
+
+  - id: "PA-003"
+    name: "Non-System Binary Accessing Sensitive Process"
+    description: "Detects processes outside C:\\Windows\\System32 opening handles to lsass, winlogon, or csrss — unexpected binaries accessing these processes are a strong injection or dumping indicator"
+    severity: high
+    mitre_technique: "T1055"
+    mitre_tactic: "Defense Evasion"
+    event_id: 10
+    conditions:
+      - field: "TargetImage"
+        operator: regex
+        value: "(lsass|winlogon|csrss)\\.exe$"
+        case_insensitive: true
+      - field: "SourceImage"
+        operator: not_contains
+        value: "C:\\Windows\\System32"
+        case_insensitive: true
+    logic: AND
+    false_positive_notes: "Third-party security tools installed outside System32 may trigger this. Verify SourceImage path and signing status."
+    tuning_tag: "sensitive_process_access"

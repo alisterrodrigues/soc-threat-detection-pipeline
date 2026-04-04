@@ -28,14 +28,14 @@ rules:
     event_id: 1
     conditions:
       - field: "ParentImage"
-        operator: contains
-        value: "WINWORD.EXE"
+        operator: regex
+        value: "(WINWORD|EXCEL|OUTLOOK|POWERPNT)\\.EXE$"
         case_insensitive: true
       - field: "Image"
-        operator: contains
-        value: "cmd.exe"
+        operator: regex
+        value: "(cmd|powershell)\\.exe$"
         case_insensitive: true
-    logic: OR
+    logic: AND
     false_positive_notes: "Some Office add-ins spawn shells legitimately. Check parent document path and CommandLine."
     tuning_tag: "office_shell_spawn"
 
@@ -48,8 +48,8 @@ rules:
     event_id: 1
     conditions:
       - field: "Image"
-        operator: endswith
-        value: "net.exe"
+        operator: regex
+        value: "net1?\\.exe$"
         case_insensitive: true
       - field: "CommandLine"
         operator: contains
@@ -76,8 +76,8 @@ rules:
     tuning_tag: "whoami_exec"
 
   - id: "PROC-005"
-    name: "Certutil Used for File Download"
-    description: "Detects certutil.exe invoked with -urlcache or -split flags — frequently abused to download payloads"
+    name: "Certutil Used for File Download or Encoding"
+    description: "Detects certutil.exe invoked with -urlcache, -split, -decode, or -encode flags — frequently abused to download or obfuscate payloads"
     severity: high
     mitre_technique: "T1105"
     mitre_tactic: "Command and Control"
@@ -88,12 +88,12 @@ rules:
         value: "certutil.exe"
         case_insensitive: true
       - field: "CommandLine"
-        operator: contains
-        value: "-urlcache"
+        operator: regex
+        value: "(-urlcache|-split|-decode|-encode)"
         case_insensitive: true
     logic: AND
-    false_positive_notes: "Certutil has legitimate certificate management uses. Flag only when -urlcache or -split appear."
-    tuning_tag: "certutil_download"
+    false_positive_notes: "Certutil has legitimate certificate management uses. Flag only when download or encoding flags appear."
+    tuning_tag: "certutil_lolbin"
 
   - id: "PROC-006"
     name: "MSHTA Execution"

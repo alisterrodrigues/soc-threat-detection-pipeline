@@ -1,10 +1,11 @@
 import logging
 
 from rich import box
+from rich.columns import Columns
 from rich.console import Console
-from rich.layout import Layout
 from rich.panel import Panel
 from rich.table import Table
+from rich.text import Text
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ def build_header(stats: dict, events_processed: int, events_per_sec: float) -> P
         events_per_sec: Computed throughput value for display.
 
     Returns:
-        A Rich Panel suitable for placement in the 'header' Layout region.
+        A Rich Panel suitable for the header row.
     """
     header_text = (
         f"[bold]SOC Threat Detection Pipeline[/bold]  |  "
@@ -41,20 +42,20 @@ def build_header(stats: dict, events_processed: int, events_per_sec: float) -> P
 
 def build_alert_table(alerts: list[dict], max_alerts: int = 50) -> Table:
     """
-    Build a Rich Table showing the most recent alerts in reverse-chronological order.
+    Build a Rich Table showing alerts in the order they fired.
 
     Columns: Time, Rule, Severity (color-coded), Computer, MITRE Technique.
-    Truncated to max_alerts rows so the terminal doesn't overflow.
+    Truncated to max_alerts rows.
 
     Args:
-        alerts: List of alert dicts from AlertStore.get_alerts().
+        alerts: List of alert dicts from the pipeline run.
         max_alerts: Maximum number of rows to render.
 
     Returns:
-        A configured Rich Table ready to be inserted into a Layout.
+        A configured Rich Table.
     """
     table = Table(
-        title="Live Alert Feed",
+        title="Alert Feed",
         box=box.SIMPLE_HEAD,
         show_header=True,
         header_style="bold magenta",
@@ -90,7 +91,7 @@ def build_stats_panel(stats: dict) -> Panel:
         stats: Aggregate stats dict from AlertStore.get_stats().
 
     Returns:
-        A Rich Panel suitable for the 'stats' Layout region.
+        A Rich Panel for the stats column.
     """
     severity_order = ["critical", "high", "medium", "low"]
     lines = []
@@ -114,7 +115,7 @@ def build_stats_panel(stats: dict) -> Panel:
     sorted_rules = sorted(by_rule.items(), key=lambda x: x[1]["count"], reverse=True)[:5]
     for rule_id, rule_data in sorted_rules:
         lines.append(
-            f"[cyan]{rule_id}[/cyan]  {rule_data['name'][:30]}  [yellow]{rule_data['count']}[/yellow]"
+            f"[cyan]{rule_id}[/cyan]  {rule_data['name'][:28]}  [yellow]{rule_data['count']}[/yellow]"
         )
 
     return Panel("\n".join(lines), title="Detection Stats", border_style="blue")
@@ -130,7 +131,7 @@ def build_footer(db_path: str, last_event_time: str, rule_count: int) -> Panel:
         rule_count: Number of detection rules currently loaded.
 
     Returns:
-        A Rich Panel suitable for the 'footer' Layout region.
+        A Rich Panel for the footer row.
     """
     footer_text = (
         f"DB: [dim]{db_path}[/dim]  |  "
@@ -151,12 +152,13 @@ def run_dashboard(
     max_alerts: int = 50,
 ):
     """
-    Render a complete terminal dashboard layout and print it to stdout.
+    Render a compact terminal dashboard directly sized to its content.
 
-    Constructs a three-region Layout (header / body / footer) where the body
-    is split into an alert table (2/3 width) and a stats panel (1/3 width).
-    This is a one-shot render — for continuous live updates, wrap repeated
-    calls in a Rich Live context outside this function.
+    Prints three stacked sections: a header bar, a side-by-side body row
+    (alert table left, stats panel right), and a footer bar. Uses direct
+    console.print() calls rather than Layout so output height is determined
+    by content — no empty space between the last alert row and the footer
+    regardless of terminal size.
 
     Args:
         alerts: List of alert dicts to display in the table.
@@ -168,22 +170,26 @@ def run_dashboard(
         refresh_rate: Retained for API compatibility; unused in one-shot mode.
         max_alerts: Maximum number of alert rows to render in the table.
     """
-    layout = Layout()
-    layout.split_column(
-        Layout(name="header", size=3),
-        Layout(name="body"),
-        Layout(name="footer", size=3),
-    )
-    layout["body"].split_row(
-        Layout(name="alerts", ratio=2),
-        Layout(name="stats", ratio=1),
-    )
-
     last_event_time = alerts[0]["timestamp"] if alerts else ""
 
-    layout["header"].update(build_header(stats, events_processed, events_per_sec))
-    layout["body"]["alerts"].update(build_alert_table(alerts, max_alerts))
-    layout["body"]["stats"].update(build_stats_panel(stats))
-    layout["footer"].update(build_footer(db_path, last_event_time, rule_count))
+    # Header — full width
+    console.print(build_header(stats, events_processed, events_per_sec))
 
-    console.print(layout)
+    # Body — alert table (left, 2/3) and stats panel (right, 1/3) side by side.
+    # Columns sizes are expressed as character widths; we let Rich pick the
+    # split by giving the stats panel a fixed width and the table the remainder.
+    alert_table = build_alert_table(alerts, max_alerts)
+    stats_panel = build_stats_panel(stats)
+
+    # Wrap in panels so borders are consistent, then print as Columns.
+    body = Columns(
+        [
+            Panel(alert_table, border_style="dim", padding=(0, 1)),
+            Panel(stats_panel, border_style="dim", padding=(0, 1), width=48),
+        ],
+        expand=True,
+    )
+    console.print(body)
+
+    # Footer — full width, immediately after body with no gap
+    console.print(build_footer(db_path, last_event_time, rule_count))

@@ -13,7 +13,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from engine.alert_store import AlertStore
-from engine.enricher import enrich_event, flag_suspicious_parent
+from engine.enricher import enrich_event
 from engine.parser import parse_sysmon_xml
 from engine.rule_engine import evaluate_event, load_rules
 

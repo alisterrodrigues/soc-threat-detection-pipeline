@@ -1,19 +1,23 @@
 rules:
   - id: "NET-001"
     name: "Browser Outbound on Non-Standard Port"
-    description: "Detects common browsers making outbound connections on ports other than 80/443 — potential C2 traffic tunneling"
+    description: "Detects common browsers making outbound connections on ports other than 80 or 443 — potential C2 traffic tunneling"
     severity: medium
     mitre_technique: "T1571"
     mitre_tactic: "Command and Control"
     event_id: 3
     conditions:
       - field: "Image"
-        operator: contains
-        value: "chrome.exe"
+        operator: regex
+        value: "(chrome|firefox|msedge|iexplore)\\.exe$"
         case_insensitive: true
       - field: "DestinationPort"
         operator: not_contains
         value: "443"
+        case_insensitive: false
+      - field: "DestinationPort"
+        operator: not_contains
+        value: "80"
         case_insensitive: false
     logic: AND
     false_positive_notes: "Some web apps use alternate ports. Verify destination and whether connection is expected."
@@ -44,8 +48,8 @@ rules:
     event_id: 3
     conditions:
       - field: "Image"
-        operator: contains
-        value: "wscript.exe"
+        operator: regex
+        value: "[wc]script\\.exe$"
         case_insensitive: true
     logic: AND
     false_positive_notes: "Legitimate VBScript may contact internal shares. Verify destination and script origin."

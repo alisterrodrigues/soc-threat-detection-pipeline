@@ -15,3 +15,12 @@ enrichment:
 dashboard:
   refresh_rate_seconds: 2
   max_alerts_displayed: 50
+
+correlation:
+  enabled: true
+  time_window_seconds: 120      # Alerts within this window on the same host are grouped
+  min_alerts_for_incident: 2    # Minimum correlated alerts to emit an incident
+  risk_score_threshold: 60      # Minimum risk score to surface a correlated incident
+
+triage:
+  auto_suppress_after_fp: 3     # Auto-flag a rule as noisy after N false positive dispositions

@@ -136,6 +136,48 @@ def export_alerts(alerts: list[dict], output_dir: str, fmt: str):
                 export_logger.warning(f"Failed to write CSV export: {e}")
 
 
+def explain_alert(alert: dict):
+    """
+    Print a human-readable explanation of why a rule fired on an event.
+
+    Parses the stored matched_fields JSON blob and prints each field-value
+    pair that triggered a condition, alongside the rule name and technique.
+    Values longer than 120 characters are truncated with an ellipsis so
+    encoded commands and long command lines remain readable.
+
+    Args:
+        alert: Alert dict retrieved from AlertStore.
+    """
+    import json as _json
+
+    rule_id = alert.get("rule_id", "")
+    rule_name = alert.get("rule_name", "")
+    technique = alert.get("mitre_technique", "")
+    tactic = alert.get("mitre_tactic", "")
+    sev = alert.get("severity", "low").upper()
+    computer = alert.get("computer", "")
+    ts = alert.get("timestamp", "")[:19]
+
+    print(f"\n{'─' * 50}")
+    print(f"  {rule_id} — {rule_name}")
+    print(f"  {sev}  |  {technique}  |  {tactic}  |  {computer}  |  {ts}")
+    print(f"{'─' * 50}")
+
+    try:
+        matched = _json.loads(alert.get("matched_fields", "{}"))
+        if matched:
+            print("  Conditions matched:")
+            for field, value in matched.items():
+                display_value = str(value)
+                if len(display_value) > 120:
+                    display_value = display_value[:117] + "..."
+                print(f"    [{field}] = {display_value}")
+        else:
+            print("  No matched field detail available.")
+    except Exception:
+        print(f"  matched_fields: {alert.get('matched_fields', '')}")
+
+
 def main():
     """
     CLI entry point for the SOC Threat Detection Pipeline.
@@ -166,6 +208,16 @@ def main():
     )
     parser.add_argument(
         "--no-dashboard", action="store_true", help="Run headless — print alerts to stdout only"
+    )
+    parser.add_argument(
+        "--explain",
+        action="store_true",
+        help="For each alert, print which specific conditions matched and why",
+    )
+    parser.add_argument(
+        "--correlate",
+        action="store_true",
+        help="Run correlation engine on alerts and print incident summary",
     )
 
     args = parser.parse_args()
@@ -217,6 +269,44 @@ def main():
 
     elapsed = time.perf_counter() - start_time
     stats = store.get_stats()
+
+    # --explain: print per-alert condition breakdown
+    if args.explain:
+        for alert in all_alerts:
+            explain_alert(alert)
+        print()
+
+    # --correlate: run correlation engine and print incident report
+    if args.correlate:
+        from engine.correlator import correlate_alerts
+        from engine.scorer import score_incidents
+
+        time_window = config.get("correlation", {}).get("time_window_seconds", 120)
+        min_alerts_cfg = config.get("correlation", {}).get("min_alerts_for_incident", 2)
+        score_threshold = config.get("correlation", {}).get("risk_score_threshold", 60)
+
+        incidents = correlate_alerts(all_alerts, time_window, min_alerts_cfg)
+        incidents = score_incidents(incidents)
+
+        if not incidents:
+            print("\nCorrelation: no incidents detected above threshold.\n")
+        else:
+            print(f"\n{'━' * 50}")
+            print(f"  Correlated Incidents — {len(incidents)} detected")
+            print(f"{'━' * 50}")
+            for inc in incidents:
+                if inc["risk_score"] < score_threshold:
+                    continue
+                chains = ", ".join(inc["kill_chains"]) if inc["kill_chains"] else "none"
+                print(f"\n  [{inc['incident_id']}] Risk Score: {inc['risk_score']}/100")
+                print(f"  Host:        {inc['computer']}")
+                print(f"  Alerts:      {inc['alert_count']}  |  Duration: {inc['duration_seconds']}s")
+                print(f"  Tactics:     {', '.join(inc['tactics'])}")
+                print(f"  Kill chains: {chains}")
+                print(f"  Timeline:")
+                for a in inc["alerts"]:
+                    print(f"    {a.get('timestamp', '')[:19]}  {a.get('rule_id'):8}  {a.get('rule_name')}")
+            print(f"\n{'━' * 50}\n")
 
     if args.export:
         export_alerts(all_alerts, output_dir, args.export)

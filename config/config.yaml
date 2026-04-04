@@ -1,0 +1,17 @@
+pipeline:
+  log_level: INFO
+  output_format: json
+  alert_db_path: output/alerts.db
+  benchmark_mode: false
+
+rules:
+  rules_dir: rules/
+  severity_threshold: low
+
+enrichment:
+  enable_process_tree: true
+  max_parent_depth: 3
+
+dashboard:
+  refresh_rate_seconds: 2
+  max_alerts_displayed: 50

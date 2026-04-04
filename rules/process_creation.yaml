@@ -1,0 +1,112 @@
+rules:
+  - id: "PROC-001"
+    name: "Suspicious PowerShell Encoded Command"
+    description: "Detects PowerShell launched with -EncodedCommand flag, common in fileless malware and LOLBin abuse"
+    severity: high
+    mitre_technique: "T1059.001"
+    mitre_tactic: "Execution"
+    event_id: 1
+    conditions:
+      - field: "Image"
+        operator: contains
+        value: "powershell.exe"
+        case_insensitive: true
+      - field: "CommandLine"
+        operator: contains
+        value: "-EncodedCommand"
+        case_insensitive: true
+    logic: AND
+    false_positive_notes: "Legitimate admin scripts may use encoded commands. Verify parent process and context."
+    tuning_tag: "powershell_encoded"
+
+  - id: "PROC-002"
+    name: "Office Application Spawning Command Shell"
+    description: "Detects cmd.exe or powershell.exe spawned directly by a Microsoft Office application — common macro abuse pattern"
+    severity: high
+    mitre_technique: "T1059.003"
+    mitre_tactic: "Execution"
+    event_id: 1
+    conditions:
+      - field: "ParentImage"
+        operator: contains
+        value: "WINWORD.EXE"
+        case_insensitive: true
+      - field: "Image"
+        operator: contains
+        value: "cmd.exe"
+        case_insensitive: true
+    logic: OR
+    false_positive_notes: "Some Office add-ins spawn shells legitimately. Check parent document path and CommandLine."
+    tuning_tag: "office_shell_spawn"
+
+  - id: "PROC-003"
+    name: "Net User Enumeration"
+    description: "Detects net.exe or net1.exe run with the user or localgroup subcommand — common post-exploitation enumeration"
+    severity: medium
+    mitre_technique: "T1087.001"
+    mitre_tactic: "Discovery"
+    event_id: 1
+    conditions:
+      - field: "Image"
+        operator: endswith
+        value: "net.exe"
+        case_insensitive: true
+      - field: "CommandLine"
+        operator: contains
+        value: "user"
+        case_insensitive: true
+    logic: AND
+    false_positive_notes: "IT helpdesk and domain admins use net user frequently. Correlate with other discovery activity."
+    tuning_tag: "net_user_enum"
+
+  - id: "PROC-004"
+    name: "Whoami Execution"
+    description: "Detects execution of whoami.exe — rarely used legitimately, common in post-exploitation scripts"
+    severity: low
+    mitre_technique: "T1033"
+    mitre_tactic: "Discovery"
+    event_id: 1
+    conditions:
+      - field: "Image"
+        operator: endswith
+        value: "whoami.exe"
+        case_insensitive: true
+    logic: AND
+    false_positive_notes: "Some IT inventory scripts run whoami. Correlate with parent process and timing."
+    tuning_tag: "whoami_exec"
+
+  - id: "PROC-005"
+    name: "Certutil Used for File Download"
+    description: "Detects certutil.exe invoked with -urlcache or -split flags — frequently abused to download payloads"
+    severity: high
+    mitre_technique: "T1105"
+    mitre_tactic: "Command and Control"
+    event_id: 1
+    conditions:
+      - field: "Image"
+        operator: endswith
+        value: "certutil.exe"
+        case_insensitive: true
+      - field: "CommandLine"
+        operator: contains
+        value: "-urlcache"
+        case_insensitive: true
+    logic: AND
+    false_positive_notes: "Certutil has legitimate certificate management uses. Flag only when -urlcache or -split appear."
+    tuning_tag: "certutil_download"
+
+  - id: "PROC-006"
+    name: "MSHTA Execution"
+    description: "Detects mshta.exe execution — used to run malicious HTA files and execute remote scripts"
+    severity: high
+    mitre_technique: "T1218.005"
+    mitre_tactic: "Defense Evasion"
+    event_id: 1
+    conditions:
+      - field: "Image"
+        operator: endswith
+        value: "mshta.exe"
+        case_insensitive: true
+    logic: AND
+    false_positive_notes: "Legitimate use of mshta is rare in modern environments. Treat as high-confidence unless whitelisted."
+    tuning_tag: "mshta_exec"

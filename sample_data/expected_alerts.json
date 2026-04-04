@@ -1,0 +1,14 @@
+[
+  {"rule_id": "PROC-001", "event_description": "PowerShell encoded command"},
+  {"rule_id": "PROC-002", "event_description": "Office spawning cmd.exe"},
+  {"rule_id": "PROC-003", "event_description": "Net user enumeration"},
+  {"rule_id": "PROC-004", "event_description": "Whoami execution"},
+  {"rule_id": "PROC-005", "event_description": "Certutil download"},
+  {"rule_id": "PROC-006", "event_description": "MSHTA execution"},
+  {"rule_id": "NET-001", "event_description": "Browser on non-standard port"},
+  {"rule_id": "NET-002", "event_description": "Direct IP connection"},
+  {"rule_id": "NET-003", "event_description": "Scripting host network connection"},
+  {"rule_id": "REG-001", "event_description": "Run key persistence"},
+  {"rule_id": "REG-002", "event_description": "Defender disabled"},
+  {"rule_id": "REG-003", "event_description": "UAC bypass registry"}
+]

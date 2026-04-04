@@ -1,0 +1,48 @@
+rules:
+  - id: "REG-001"
+    name: "Run Key Persistence"
+    description: "Detects modification of HKLM or HKCU Run keys — standard persistence mechanism used by malware"
+    severity: high
+    mitre_technique: "T1547.001"
+    mitre_tactic: "Persistence"
+    event_id: 13
+    conditions:
+      - field: "TargetObject"
+        operator: contains
+        value: "\\CurrentVersion\\Run"
+        case_insensitive: true
+    logic: AND
+    false_positive_notes: "Software installers commonly write to Run keys. Verify the writing process and value data."
+    tuning_tag: "run_key_persistence"
+
+  - id: "REG-002"
+    name: "Windows Defender Disabled via Registry"
+    description: "Detects registry modification that disables Windows Defender real-time protection"
+    severity: critical
+    mitre_technique: "T1562.001"
+    mitre_tactic: "Defense Evasion"
+    event_id: 13
+    conditions:
+      - field: "TargetObject"
+        operator: contains
+        value: "DisableRealtimeMonitoring"
+        case_insensitive: true
+    logic: AND
+    false_positive_notes: "Enterprise AV management solutions may toggle this key. Verify writing process is expected."
+    tuning_tag: "defender_disabled"
+
+  - id: "REG-003"
+    name: "UAC Bypass via Registry"
+    description: "Detects modification of the ConsentPromptBehaviorAdmin key to 0, disabling UAC prompts"
+    severity: critical
+    mitre_technique: "T1548.002"
+    mitre_tactic: "Privilege Escalation"
+    event_id: 13
+    conditions:
+      - field: "TargetObject"
+        operator: contains
+        value: "ConsentPromptBehaviorAdmin"
+        case_insensitive: true
+    logic: AND
+    false_positive_notes: "Some enterprise management tools adjust UAC settings centrally. Correlate with change management."
+    tuning_tag: "uac_bypass_registry"

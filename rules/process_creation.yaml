@@ -40,8 +40,8 @@ rules:
     tuning_tag: "office_shell_spawn"
 
   - id: "PROC-003"
-    name: "Net User Enumeration"
-    description: "Detects net.exe or net1.exe run with the user or localgroup subcommand — common post-exploitation enumeration"
+    name: "Net User or Group Enumeration"
+    description: "Detects net.exe or net1.exe run with the user or localgroup subcommand — common post-exploitation enumeration of local accounts and groups"
     severity: medium
     mitre_technique: "T1087.001"
     mitre_tactic: "Discovery"
@@ -52,12 +52,12 @@ rules:
         value: "net1?\\.exe$"
         case_insensitive: true
       - field: "CommandLine"
-        operator: contains
-        value: "user"
+        operator: regex
+        value: "(user|localgroup)"
         case_insensitive: true
     logic: AND
-    false_positive_notes: "IT helpdesk and domain admins use net user frequently. Correlate with other discovery activity."
-    tuning_tag: "net_user_enum"
+    false_positive_notes: "IT helpdesk and domain admins use net user and net localgroup frequently. Correlate with other discovery activity."
+    tuning_tag: "net_enum"
 
   - id: "PROC-004"
     name: "Whoami Execution"

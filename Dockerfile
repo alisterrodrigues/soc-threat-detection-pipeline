@@ -7,7 +7,7 @@ LABEL description="SOC Threat Detection Pipeline — Sysmon behavioral detection
 
 WORKDIR /app
 
-# Install dependencies first so this layer is cached independently of source changes
+# Install runtime dependencies only — dev dependencies (pytest) are excluded
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

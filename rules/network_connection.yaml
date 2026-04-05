@@ -12,7 +12,7 @@ rules:
         value: "(chrome|firefox|msedge|iexplore)\\.exe$"
         case_insensitive: true
       - field: "DestinationPort"
-        operator: not_contains
+        operator: not_equals
         value: "443"
         case_insensitive: false
       - field: "DestinationPort"
@@ -25,9 +25,9 @@ rules:
 
   - id: "NET-002"
     name: "Connection to IP Address Without Hostname"
-    description: "Detects outbound connections where the destination has no DNS hostname — potential C2 beacon to hardcoded IP"
+    description: "Detects outbound connections where the destination has no DNS hostname — indicates direct-to-IP communication that bypasses DNS, a common C2 pattern"
     severity: medium
-    mitre_technique: "T1071.004"
+    mitre_technique: "T1071"
     mitre_tactic: "Command and Control"
     event_id: 3
     conditions:

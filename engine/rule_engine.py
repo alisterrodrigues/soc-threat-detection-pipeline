@@ -85,6 +85,10 @@ def _evaluate_conditions(event: dict, rule: dict) -> tuple[bool, dict]:
     """
     Evaluate all conditions defined in a rule against a single event.
 
+    Returns (False, {}) immediately if the rule has no conditions — an empty
+    condition list should never match, not match everything (which is what
+    Python's all([]) would do by default).
+
     Applies AND or OR logic across all condition results. Collects the
     fields and values that individually triggered for inclusion in alerts.
 
@@ -96,6 +100,13 @@ def _evaluate_conditions(event: dict, rule: dict) -> tuple[bool, dict]:
         Tuple of (matched: bool, matched_fields: dict of field->value pairs).
     """
     conditions = rule.get("conditions", [])
+
+    # Guard: a rule with no conditions must not fire on every event.
+    # all([]) is True in Python, which would cause mass false positives.
+    if not conditions:
+        logger.warning(f"Rule {rule.get('id', 'unknown')} has no conditions — skipping to prevent mass firing.")
+        return False, {}
+
     logic = rule.get("logic", "AND").upper()
     matched_fields = {}
 

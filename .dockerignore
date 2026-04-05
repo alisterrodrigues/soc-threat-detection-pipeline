@@ -1,0 +1,17 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+output/alerts.db
+output/alerts.json
+output/alerts.csv
+output/incident_report.html
+.git/
+.DS_Store
+*.egg-info/
+dist/
+build/

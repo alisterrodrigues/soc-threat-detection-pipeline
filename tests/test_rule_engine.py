@@ -149,3 +149,11 @@ rules:
     rules = load_rules(str(tmp_path))
     assert len(rules) == 1
     assert rules[0]["id"] == "TEST-001"
+
+
+def test_not_equals_operator():
+    """'not_equals' returns True when the event value differs from the rule value."""
+    from engine.rule_engine import _apply_operator
+    assert _apply_operator("8080", "80", "not_equals", False)
+    assert _apply_operator("8080", "443", "not_equals", False)
+    assert not _apply_operator("80", "80", "not_equals", False)

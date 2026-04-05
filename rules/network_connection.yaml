@@ -1,7 +1,7 @@
 rules:
   - id: "NET-001"
     name: "Browser Outbound on Non-Standard Port"
-    description: "Detects common browsers making outbound connections on ports other than 80 or 443 — potential C2 traffic tunneling"
+    description: "Detects common browsers making outbound TCP connections on ports other than 80 or 443 — potential C2 beaconing or traffic tunneling over non-standard ports"
     severity: medium
     mitre_technique: "T1571"
     mitre_tactic: "Command and Control"
@@ -16,7 +16,7 @@ rules:
         value: "443"
         case_insensitive: false
       - field: "DestinationPort"
-        operator: not_contains
+        operator: not_equals
         value: "80"
         case_insensitive: false
     logic: AND

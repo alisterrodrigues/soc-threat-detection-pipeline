@@ -1,19 +1,34 @@
+"""
+Terminal dashboard — Rich-based live tailing display for the detection pipeline.
+
+Two rendering modes:
+  - One-shot mode (default): renders the current alert set once and exits.
+    Used when the pipeline has finished processing a static log file.
+  - Live mode (--live flag): polls AlertStore every N seconds for new alerts,
+    updating the display until the user presses Ctrl+C.
+
+The layout is content-sized — header, body, and footer are stacked with no
+terminal-height dependency, so the footer always appears immediately after
+the last alert row regardless of terminal window size.
+"""
+
 import logging
+import time
 
 from rich import box
 from rich.columns import Columns
 from rich.console import Console
+from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
-from rich.text import Text
 
 logger = logging.getLogger(__name__)
 
 SEVERITY_COLORS = {
     "critical": "bold red",
-    "high": "bold yellow",
-    "medium": "yellow",
-    "low": "cyan",
+    "high":     "bold yellow",
+    "medium":   "yellow",
+    "low":      "cyan",
 }
 
 console = Console()
@@ -29,7 +44,7 @@ def build_header(stats: dict, events_processed: int, events_per_sec: float) -> P
         events_per_sec: Computed throughput value for display.
 
     Returns:
-        A Rich Panel suitable for the header row.
+        A Rich Panel for the header row.
     """
     header_text = (
         f"[bold]SOC Threat Detection Pipeline[/bold]  |  "
@@ -40,15 +55,12 @@ def build_header(stats: dict, events_processed: int, events_per_sec: float) -> P
     return Panel(header_text, style="bold white on dark_blue")
 
 
-def build_alert_table(alerts: list[dict], max_alerts: int = 50) -> Table:
+def build_alert_table(alerts: list, max_alerts: int = 50) -> Table:
     """
     Build a Rich Table showing alerts in the order they fired.
 
-    Columns: Time, Rule, Severity (color-coded), Computer, MITRE Technique.
-    Truncated to max_alerts rows.
-
     Args:
-        alerts: List of alert dicts from the pipeline run.
+        alerts: List of alert dicts from the pipeline run or AlertStore.
         max_alerts: Maximum number of rows to render.
 
     Returns:
@@ -83,9 +95,6 @@ def build_alert_table(alerts: list[dict], max_alerts: int = 50) -> Table:
 def build_stats_panel(stats: dict) -> Panel:
     """
     Build the right-side statistics Panel with severity bars and top-rule counts.
-
-    Renders a simple ASCII bar chart for severity breakdown and a ranked list
-    of the five most frequently firing rules.
 
     Args:
         stats: Aggregate stats dict from AlertStore.get_stats().
@@ -141,47 +150,40 @@ def build_footer(db_path: str, last_event_time: str, rule_count: int) -> Panel:
     return Panel(footer_text, style="dim")
 
 
-def run_dashboard(
-    alerts: list[dict],
+def _render_frame(
+    alerts: list,
     stats: dict,
     events_processed: int,
     events_per_sec: float,
     db_path: str,
     rule_count: int,
-    refresh_rate: float = 2.0,
-    max_alerts: int = 50,
+    max_alerts: int,
 ):
     """
-    Render a compact terminal dashboard directly sized to its content.
+    Assemble a complete dashboard frame as a Rich renderable Group.
 
-    Prints three stacked sections: a header bar, a side-by-side body row
-    (alert table left, stats panel right), and a footer bar. Uses direct
-    console.print() calls rather than Layout so output height is determined
-    by content — no empty space between the last alert row and the footer
-    regardless of terminal size.
+    Stacks header, side-by-side body (alert table + stats panel), and footer
+    with no empty space between sections — content-driven height.
 
     Args:
-        alerts: List of alert dicts to display in the table.
-        stats: Aggregate stats dict from AlertStore.get_stats().
-        events_processed: Total events evaluated in this pipeline run.
-        events_per_sec: Pipeline throughput for the header metric.
-        db_path: SQLite database path shown in the footer.
-        rule_count: Number of loaded rules shown in the footer.
-        refresh_rate: Retained for API compatibility; unused in one-shot mode.
-        max_alerts: Maximum number of alert rows to render in the table.
+        alerts: Current list of alert dicts to display.
+        stats: Current aggregate stats dict.
+        events_processed: Total events processed so far.
+        events_per_sec: Current throughput metric.
+        db_path: SQLite database path for the footer.
+        rule_count: Number of loaded rules for the footer.
+        max_alerts: Maximum alert rows to render.
+
+    Returns:
+        A Rich Group renderable.
     """
+    from rich.console import Group
+
     last_event_time = alerts[0]["timestamp"] if alerts else ""
 
-    # Header — full width
-    console.print(build_header(stats, events_processed, events_per_sec))
-
-    # Body — alert table (left, 2/3) and stats panel (right, 1/3) side by side.
-    # Columns sizes are expressed as character widths; we let Rich pick the
-    # split by giving the stats panel a fixed width and the table the remainder.
+    header = build_header(stats, events_processed, events_per_sec)
     alert_table = build_alert_table(alerts, max_alerts)
     stats_panel = build_stats_panel(stats)
-
-    # Wrap in panels so borders are consistent, then print as Columns.
     body = Columns(
         [
             Panel(alert_table, border_style="dim", padding=(0, 1)),
@@ -189,7 +191,76 @@ def run_dashboard(
         ],
         expand=True,
     )
-    console.print(body)
+    footer = build_footer(db_path, last_event_time, rule_count)
 
-    # Footer — full width, immediately after body with no gap
-    console.print(build_footer(db_path, last_event_time, rule_count))
+    return Group(header, body, footer)
+
+
+def run_dashboard(
+    alerts: list,
+    stats: dict,
+    events_processed: int,
+    events_per_sec: float,
+    db_path: str,
+    rule_count: int,
+    refresh_rate: float = 2.0,
+    max_alerts: int = 50,
+    live: bool = False,
+    store=None,
+):
+    """
+    Render the terminal dashboard in one-shot or live tailing mode.
+
+    One-shot mode (live=False, default):
+        Renders the provided alert list once and returns immediately.
+        Used after a completed batch pipeline run on a static log file.
+
+    Live mode (live=True):
+        Enters a Rich Live context and polls AlertStore every refresh_rate
+        seconds for new alerts. Runs until the user interrupts with Ctrl+C.
+        Requires store to be a valid AlertStore instance.
+
+    Args:
+        alerts: Initial alert list (used in one-shot mode).
+        stats: Initial stats dict (used in one-shot mode).
+        events_processed: Total events evaluated during this run.
+        events_per_sec: Pipeline throughput for the header display.
+        db_path: SQLite database path shown in the footer.
+        rule_count: Number of loaded rules shown in the footer.
+        refresh_rate: Seconds between live refreshes (live mode only).
+        max_alerts: Maximum alert rows to render in the table.
+        live: When True, run in continuous tailing mode.
+        store: AlertStore instance required for live mode polling.
+    """
+    if not live:
+        frame = _render_frame(
+            alerts, stats, events_processed, events_per_sec,
+            db_path, rule_count, max_alerts,
+        )
+        console.print(frame)
+        return
+
+    if store is None:
+        logger.warning("Live mode requires an AlertStore instance. Falling back to one-shot.")
+        frame = _render_frame(
+            alerts, stats, events_processed, events_per_sec,
+            db_path, rule_count, max_alerts,
+        )
+        console.print(frame)
+        return
+
+    console.print("[dim]Live dashboard active — press Ctrl+C to exit[/dim]")
+
+    try:
+        with Live(console=console, refresh_per_second=1, screen=False) as live_ctx:
+            while True:
+                current_alerts = store.get_alerts()
+                current_stats = store.get_stats()
+                frame = _render_frame(
+                    current_alerts, current_stats, events_processed, events_per_sec,
+                    db_path, rule_count, max_alerts,
+                )
+                live_ctx.update(frame)
+                time.sleep(refresh_rate)
+    except KeyboardInterrupt:
+        console.print("\n[dim]Dashboard closed.[/dim]")

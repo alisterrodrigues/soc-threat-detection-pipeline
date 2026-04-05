@@ -126,8 +126,8 @@ def _apply_operator(event_value: str, rule_value: str, operator: str, case_insen
     """
     Apply a single condition operator and return whether it matches.
 
-    Supported operators: contains, not_contains, equals, startswith,
-    endswith, regex. Unknown operators log a warning and return False.
+    Supported operators: contains, not_contains, equals, not_equals,
+    startswith, endswith, regex. Unknown operators log a warning and return False.
 
     Args:
         event_value: The string value extracted from the event field.
@@ -152,6 +152,8 @@ def _apply_operator(event_value: str, rule_value: str, operator: str, case_insen
             return rv not in ev
         elif operator == "equals":
             return ev == rv
+        elif operator == "not_equals":
+            return ev != rv
         elif operator == "startswith":
             return ev.startswith(rv)
         elif operator == "endswith":

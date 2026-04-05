@@ -277,6 +277,11 @@ def main():
         "--no-dashboard", action="store_true", help="Run headless — print alerts to stdout only"
     )
     parser.add_argument(
+        "--live",
+        action="store_true",
+        help="Run dashboard in live tailing mode — polls the alert database until Ctrl+C",
+    )
+    parser.add_argument(
         "--explain",
         action="store_true",
         help="For each alert, print which specific conditions matched and why",
@@ -430,6 +435,8 @@ def main():
             rule_count=len(rules),
             refresh_rate=refresh_rate,
             max_alerts=max_alerts,
+            live=getattr(args, "live", False),
+            store=store if getattr(args, "live", False) else None,
         )
 
 

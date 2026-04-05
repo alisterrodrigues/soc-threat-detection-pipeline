@@ -9,7 +9,7 @@ Options:
     --db PATH           Path to alerts.db  [default: output/alerts.db]
     --config PATH       Path to config.yaml [default: config/config.yaml]
     --rule RULE_ID      Filter to a specific rule ID
-    --severity LEVEL    Filter to alerts at or above this severity
+    --severity LEVEL    Exact severity filter (low|medium|high|critical)
     --undispositioned   Show only alerts not yet reviewed
     --stats             Print rule-level FP/TP summary and exit
 """
@@ -260,7 +260,11 @@ def main():
     parser.add_argument("--db", default="output/alerts.db", help="Path to alerts.db")
     parser.add_argument("--config", default="config/config.yaml", help="Path to config.yaml")
     parser.add_argument("--rule", default=None, help="Filter to a specific rule ID")
-    parser.add_argument("--severity", default=None, help="Minimum severity to show")
+    parser.add_argument(
+        "--severity",
+        default=None,
+        help="Exact severity filter (low|medium|high|critical) — shows only alerts at this severity level",
+    )
     parser.add_argument(
         "--undispositioned",
         action="store_true",

@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "soc-threat-detection-pipeline"
+version = "1.0.0"
+description = "Behavioral threat detection engine for Windows Sysmon event logs with MITRE ATT&CK-mapped rules, correlation engine, and analyst triage CLI"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.11"
+dependencies = [
+    "pyyaml>=6.0",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+evtx = ["python-evtx>=0.7.4"]
+
+[project.scripts]
+soc-pipeline = "cli.main:main"
+soc-triage = "cli.triage:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["engine*", "cli*", "dashboard*"]

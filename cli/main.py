@@ -178,6 +178,63 @@ def explain_alert(alert: dict):
         print(f"  matched_fields: {alert.get('matched_fields', '')}")
 
 
+def run_hunt(alerts: list[dict], terms: str):
+    """
+    Search all alert fields for one or more keywords and print matching alerts.
+
+    Hunt mode scans every string field in every alert dict for any of the
+    provided comma-separated terms (case-insensitive). Useful for quickly
+    finding alerts related to a specific binary, IP, registry key, or technique
+    without running a full triage session.
+
+    Args:
+        alerts: List of alert dicts from the pipeline run.
+        terms: Comma-separated search terms string. Example: "powershell,certutil"
+    """
+    keywords = [t.strip().lower() for t in terms.split(",") if t.strip()]
+    if not keywords:
+        print("Hunt: no search terms provided.")
+        return
+
+    hits = []
+    for alert in alerts:
+        flat = json.dumps(alert, default=str).lower()
+        if any(kw in flat for kw in keywords):
+            hits.append(alert)
+
+    print(f"\n{'━' * 50}")
+    print(f"  Hunt Results — terms: {', '.join(keywords)}")
+    print(f"  {len(hits)} alert(s) matched out of {len(alerts)} total")
+    print(f"{'━' * 50}")
+
+    if not hits:
+        print("  No matching alerts found.\n")
+        return
+
+    for alert in hits:
+        sev = alert.get("severity", "low").upper()
+        rule_id = alert.get("rule_id", "")
+        rule_name = alert.get("rule_name", "")
+        ts = alert.get("timestamp", "")[:19]
+        computer = alert.get("computer", "")
+        technique = alert.get("mitre_technique", "")
+
+        print(f"\n  {ts}  [{rule_id}] {rule_name}")
+        print(f"  {sev}  |  {technique}  |  {computer}")
+
+        try:
+            matched = json.loads(alert.get("matched_fields", "{}"))
+            for field, value in matched.items():
+                display = str(value)
+                if len(display) > 100:
+                    display = display[:97] + "..."
+                print(f"    {field}: {display}")
+        except Exception:
+            pass
+
+    print(f"\n{'━' * 50}\n")
+
+
 def main():
     """
     CLI entry point for the SOC Threat Detection Pipeline.
@@ -190,6 +247,11 @@ def main():
         description="SOC Threat Detection Pipeline — Sysmon behavioral detection engine"
     )
     parser.add_argument("--input", required=True, help="Path to Sysmon XML log file")
+    parser.add_argument(
+        "--evtx",
+        action="store_true",
+        help="Treat --input as a .evtx file and use the EVTX parser instead of XML parser",
+    )
     parser.add_argument("--config", default="config/config.yaml", help="Path to config.yaml")
     parser.add_argument("--output-dir", default="output/", help="Directory for output files")
     parser.add_argument(
@@ -207,6 +269,11 @@ def main():
         help="Export alerts after processing",
     )
     parser.add_argument(
+        "--report",
+        action="store_true",
+        help="Generate a self-contained HTML incident report in the output directory",
+    )
+    parser.add_argument(
         "--no-dashboard", action="store_true", help="Run headless — print alerts to stdout only"
     )
     parser.add_argument(
@@ -218,6 +285,15 @@ def main():
         "--correlate",
         action="store_true",
         help="Run correlation engine on alerts and print incident summary",
+    )
+    parser.add_argument(
+        "--hunt",
+        default=None,
+        metavar="TERMS",
+        help=(
+            "Hunt mode: comma-separated keywords to search across all alert fields. "
+            "Example: --hunt 'powershell,certutil,encoded'"
+        ),
     )
 
     args = parser.parse_args()
@@ -247,7 +323,13 @@ def main():
 
     logger.info(f"Parsing events from {args.input}")
     start_time = time.perf_counter()
-    events = parse_sysmon_xml(args.input)
+
+    if getattr(args, "evtx", False):
+        from engine.evtx_parser import parse_evtx
+        events = parse_evtx(args.input)
+    else:
+        events = parse_sysmon_xml(args.input)
+
     if not events:
         logger.error("No events parsed. Check file path and format.")
         sys.exit(1)
@@ -269,6 +351,10 @@ def main():
 
     elapsed = time.perf_counter() - start_time
     stats = store.get_stats()
+
+    # --hunt: keyword search across all alert fields
+    if getattr(args, "hunt", None):
+        run_hunt(all_alerts, args.hunt)
 
     # --explain: print per-alert condition breakdown
     if args.explain:
@@ -310,6 +396,21 @@ def main():
 
     if args.export:
         export_alerts(all_alerts, output_dir, args.export)
+
+    if getattr(args, "report", False):
+        from engine.reporter import generate_html_report
+        from engine.correlator import correlate_alerts
+        from engine.scorer import score_incidents
+
+        time_window = config.get("correlation", {}).get("time_window_seconds", 120)
+        min_alerts_cfg = config.get("correlation", {}).get("min_alerts_for_incident", 2)
+
+        report_incidents = correlate_alerts(all_alerts, time_window, min_alerts_cfg)
+        report_incidents = score_incidents(report_incidents)
+
+        report_path = os.path.join(output_dir, "incident_report.html")
+        generate_html_report(report_incidents, all_alerts, stats, report_path)
+        logger.info(f"Report available at: {report_path}")
 
     if benchmark_mode:
         print_benchmark(stats, len(events), elapsed, rules)

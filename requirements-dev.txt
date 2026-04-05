@@ -1,0 +1,2 @@
+# Development dependencies — not required for running the pipeline
+pytest>=7.0

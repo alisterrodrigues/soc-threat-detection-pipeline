@@ -78,9 +78,9 @@ def print_benchmark(stats: dict, events_processed: int, elapsed: float, rules: l
         by_rule.items(), key=lambda x: x[1]["count"], default=(None, {"name": "N/A", "count": 0})
     )
 
-    print("\n" + "━" * 50)
-    print("  Detection Pipeline — Run Summary")
-    print("━" * 50)
+    print("\n" + "\u2501" * 50)
+    print("  Detection Pipeline \u2014 Run Summary")
+    print("\u2501" * 50)
     print(f"  Events processed:     {events_processed:,}")
     print(f"  Processing time:      {elapsed:.2f}s")
     print(f"  Throughput:           {throughput:,} events/sec")
@@ -92,10 +92,10 @@ def print_benchmark(stats: dict, events_processed: int, elapsed: float, rules: l
     print(f"    Low:                {by_sev.get('low', 0)}")
     if top_rule[0]:
         print(
-            f"  Top rule triggered:   {top_rule[0]} ({top_rule[1]['name']}) — {top_rule[1]['count']} hits"
+            f"  Top rule triggered:   {top_rule[0]} ({top_rule[1]['name']}) \u2014 {top_rule[1]['count']} hits"
         )
     print(f"  Alert rate:           {alert_rate:.2f}%")
-    print("━" * 50 + "\n")
+    print("\u2501" * 50 + "\n")
 
 
 def export_alerts(alerts: list[dict], output_dir: str, fmt: str):
@@ -158,10 +158,10 @@ def explain_alert(alert: dict):
     computer = alert.get("computer", "")
     ts = alert.get("timestamp", "")[:19]
 
-    print(f"\n{'─' * 50}")
-    print(f"  {rule_id} — {rule_name}")
+    print(f"\n{'\u2500' * 50}")
+    print(f"  {rule_id} \u2014 {rule_name}")
     print(f"  {sev}  |  {technique}  |  {tactic}  |  {computer}  |  {ts}")
-    print(f"{'─' * 50}")
+    print(f"{'\u2500' * 50}")
 
     try:
         matched = _json.loads(alert.get("matched_fields", "{}"))
@@ -202,10 +202,10 @@ def run_hunt(alerts: list[dict], terms: str):
         if any(kw in flat for kw in keywords):
             hits.append(alert)
 
-    print(f"\n{'━' * 50}")
-    print(f"  Hunt Results — terms: {', '.join(keywords)}")
+    print(f"\n{'\u2501' * 50}")
+    print(f"  Hunt Results \u2014 terms: {', '.join(keywords)}")
     print(f"  {len(hits)} alert(s) matched out of {len(alerts)} total")
-    print(f"{'━' * 50}")
+    print(f"{'\u2501' * 50}")
 
     if not hits:
         print("  No matching alerts found.\n")
@@ -232,7 +232,7 @@ def run_hunt(alerts: list[dict], terms: str):
         except Exception:
             pass
 
-    print(f"\n{'━' * 50}\n")
+    print(f"\n{'\u2501' * 50}\n")
 
 
 def main():
@@ -244,7 +244,7 @@ def main():
     then either renders the terminal dashboard or streams JSON to stdout.
     """
     parser = argparse.ArgumentParser(
-        description="SOC Threat Detection Pipeline — Sysmon behavioral detection engine"
+        description="SOC Threat Detection Pipeline \u2014 Sysmon behavioral detection engine"
     )
     parser.add_argument("--input", required=True, help="Path to Sysmon XML log file")
     parser.add_argument(
@@ -274,12 +274,12 @@ def main():
         help="Generate a self-contained HTML incident report in the output directory",
     )
     parser.add_argument(
-        "--no-dashboard", action="store_true", help="Run headless — print alerts to stdout only"
+        "--no-dashboard", action="store_true", help="Run headless \u2014 print alerts to stdout only"
     )
     parser.add_argument(
         "--live",
         action="store_true",
-        help="Run dashboard in live tailing mode — polls the alert database until Ctrl+C",
+        help="Run dashboard in live tailing mode \u2014 polls the alert database until Ctrl+C",
     )
     parser.add_argument(
         "--explain",
@@ -367,25 +367,32 @@ def main():
             explain_alert(alert)
         print()
 
-    # --correlate: run correlation engine and print incident report
-    if args.correlate:
+    # Run correlation once and reuse the result for both --correlate output
+    # and --report generation. Running correlate_alerts twice on the same data
+    # wastes compute and could produce inconsistent incident IDs if alert order
+    # were ever non-deterministic.
+    correlated_incidents = None
+    if args.correlate or getattr(args, "report", False):
         from engine.correlator import correlate_alerts
         from engine.scorer import score_incidents
 
         time_window = config.get("correlation", {}).get("time_window_seconds", 120)
         min_alerts_cfg = config.get("correlation", {}).get("min_alerts_for_incident", 2)
+
+        correlated_incidents = correlate_alerts(all_alerts, time_window, min_alerts_cfg)
+        correlated_incidents = score_incidents(correlated_incidents)
+
+    # --correlate: print incident summary to stdout
+    if args.correlate:
         score_threshold = config.get("correlation", {}).get("risk_score_threshold", 60)
 
-        incidents = correlate_alerts(all_alerts, time_window, min_alerts_cfg)
-        incidents = score_incidents(incidents)
-
-        if not incidents:
+        if not correlated_incidents:
             print("\nCorrelation: no incidents detected above threshold.\n")
         else:
-            print(f"\n{'━' * 50}")
-            print(f"  Correlated Incidents — {len(incidents)} detected")
-            print(f"{'━' * 50}")
-            for inc in incidents:
+            print(f"\n{'\u2501' * 50}")
+            print(f"  Correlated Incidents \u2014 {len(correlated_incidents)} detected")
+            print(f"{'\u2501' * 50}")
+            for inc in correlated_incidents:
                 if inc["risk_score"] < score_threshold:
                     continue
                 chains = ", ".join(inc["kill_chains"]) if inc["kill_chains"] else "none"
@@ -397,24 +404,17 @@ def main():
                 print(f"  Timeline:")
                 for a in inc["alerts"]:
                     print(f"    {a.get('timestamp', '')[:19]}  {a.get('rule_id'):8}  {a.get('rule_name')}")
-            print(f"\n{'━' * 50}\n")
+            print(f"\n{'\u2501' * 50}\n")
 
     if args.export:
         export_alerts(all_alerts, output_dir, args.export)
 
+    # --report: generate HTML report using the correlation result computed above
     if getattr(args, "report", False):
         from engine.reporter import generate_html_report
-        from engine.correlator import correlate_alerts
-        from engine.scorer import score_incidents
-
-        time_window = config.get("correlation", {}).get("time_window_seconds", 120)
-        min_alerts_cfg = config.get("correlation", {}).get("min_alerts_for_incident", 2)
-
-        report_incidents = correlate_alerts(all_alerts, time_window, min_alerts_cfg)
-        report_incidents = score_incidents(report_incidents)
 
         report_path = os.path.join(output_dir, "incident_report.html")
-        generate_html_report(report_incidents, all_alerts, stats, report_path)
+        generate_html_report(correlated_incidents or [], all_alerts, stats, report_path)
         logger.info(f"Report available at: {report_path}")
 
     if benchmark_mode:

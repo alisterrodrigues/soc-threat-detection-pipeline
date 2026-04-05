@@ -24,6 +24,10 @@ CREATE TABLE IF NOT EXISTS alerts (
 );
 """
 
+# Ordered severity ranks used for minimum-threshold filtering.
+# Higher index = higher severity.
+_SEVERITY_RANK = {"low": 0, "medium": 1, "high": 2, "critical": 3}
+
 
 class AlertStore:
     """SQLite-backed persistent store for detection alerts."""
@@ -93,27 +97,53 @@ class AlertStore:
             logger.warning(f"Failed to store alert {alert.get('rule_id')}: {e}")
             return None
 
-    def get_alerts(self, severity: Optional[str] = None, rule_id: Optional[str] = None) -> list[dict]:
+    def get_alerts(
+        self,
+        severity: Optional[str] = None,
+        rule_id: Optional[str] = None,
+        min_severity: Optional[str] = None,
+    ) -> list[dict]:
         """
-        Retrieve alerts with optional equality filters on severity and rule_id.
+        Retrieve alerts with optional filters on severity and rule_id.
+
+        Two severity filter modes are available and are mutually exclusive:
+          - severity: exact equality match on the severity string.
+          - min_severity: minimum-threshold filter — returns alerts at the
+            given severity and all higher severities. For example,
+            min_severity='high' returns both 'high' and 'critical' alerts.
+            Unknown severity values are treated as 'low' (match everything).
 
         Results are ordered newest-first (descending by auto-increment id).
 
         Args:
-            severity: If provided, only return alerts with this exact severity string.
+            severity: If provided, only return alerts with this exact severity.
             rule_id: If provided, only return alerts matching this rule ID.
+            min_severity: If provided, return alerts at this severity or above.
+                          Takes precedence over severity if both are given.
 
         Returns:
             List of alert dicts. Empty list on query failure or no results.
         """
         sql = "SELECT * FROM alerts WHERE 1=1"
         params = []
-        if severity:
+
+        if min_severity:
+            min_rank = _SEVERITY_RANK.get(min_severity.lower(), 0)
+            # Collect all severity labels that meet or exceed the minimum rank.
+            qualifying = [
+                sev for sev, rank in _SEVERITY_RANK.items() if rank >= min_rank
+            ]
+            placeholders = ",".join("?" * len(qualifying))
+            sql += f" AND severity IN ({placeholders})"
+            params.extend(qualifying)
+        elif severity:
             sql += " AND severity = ?"
             params.append(severity)
+
         if rule_id:
             sql += " AND rule_id = ?"
             params.append(rule_id)
+
         sql += " ORDER BY id DESC"
 
         try:

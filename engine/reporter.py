@@ -10,6 +10,7 @@ Typical usage:
     generate_html_report(incidents, alerts, stats, output_path)
 """
 
+import html
 import json
 import logging
 from datetime import datetime, timezone
@@ -38,6 +39,11 @@ TACTIC_COLORS = {
 }
 
 
+def _e(value) -> str:
+    """HTML-escape a value for safe inline insertion into HTML attributes and text."""
+    return html.escape(str(value), quote=True)
+
+
 def _sev_color(severity: str) -> str:
     """Return the hex color for a given severity string."""
     return SEVERITY_COLORS.get(severity.lower(), "#64748b")
@@ -58,8 +64,8 @@ def _render_incident_card(incident: dict) -> str:
     Render a single incident as a self-contained HTML card section.
 
     Includes the incident header, metadata grid, ATT&CK tactic pills,
-    kill chain badges, and a full alert timeline table. All values are
-    HTML-escaped implicitly by not using user-controlled markup.
+    kill chain badges, and a full alert timeline table. All user-controlled
+    values are HTML-escaped before insertion.
 
     Args:
         incident: Incident dict from score_incidents().
@@ -67,15 +73,15 @@ def _render_incident_card(incident: dict) -> str:
     Returns:
         HTML string for the incident card.
     """
-    inc_id = incident.get("incident_id", "INC-???")
+    inc_id = _e(incident.get("incident_id", "INC-???"))
     score = incident.get("risk_score", 0)
-    computer = incident.get("computer", "Unknown")
+    computer = _e(incident.get("computer", "Unknown"))
     duration = incident.get("duration_seconds", 0)
     alert_count = incident.get("alert_count", 0)
     tactics = incident.get("tactics", [])
     kill_chains = incident.get("kill_chains", [])
-    first_seen = incident.get("first_seen", "")[:19].replace("T", " ")
-    last_seen = incident.get("last_seen", "")[:19].replace("T", " ")
+    first_seen = _e(incident.get("first_seen", "")[:19].replace("T", " "))
+    last_seen = _e(incident.get("last_seen", "")[:19].replace("T", " "))
 
     if score >= 80:
         score_color = "#ef4444"
@@ -87,12 +93,12 @@ def _render_incident_card(incident: dict) -> str:
         score_color = "#06b6d4"
 
     tactic_pills = "".join(
-        f'<span class="pill" style="background:{_tactic_color(t)}">{t}</span>'
+        f'<span class="pill" style="background:{_tactic_color(t)}">{_e(t)}</span>'
         for t in tactics
     )
 
     chain_badges = "".join(
-        f'<span class="chain-badge">{c.replace("_", " ")}</span>'
+        f'<span class="chain-badge">{_e(c.replace("_", " "))}</span>'
         for c in kill_chains
     ) or '<span style="color:#64748b;font-size:0.85em">none detected</span>'
 
@@ -100,19 +106,22 @@ def _render_incident_card(incident: dict) -> str:
     for a in incident.get("alerts", []):
         sev = a.get("severity", "low")
         color = _sev_color(sev)
-        ts = a.get("timestamp", "")[:19].replace("T", " ")
+        ts = _e(a.get("timestamp", "")[:19].replace("T", " "))
+        rule_id = _e(a.get("rule_id", ""))
+        rule_name = _e(a.get("rule_name", ""))
+        technique = _e(a.get("mitre_technique", ""))
         try:
             matched = json.loads(a.get("matched_fields", "{}"))
-            fields_text = " | ".join(f"{k}: {str(v)[:60]}" for k, v in matched.items())
+            fields_text = _e(" | ".join(f"{k}: {str(v)[:60]}" for k, v in matched.items()))
         except Exception:
             fields_text = ""
         alert_rows += f"""
         <tr>
           <td class="mono" style="white-space:nowrap">{ts}</td>
-          <td><code>{a.get("rule_id","")}</code></td>
-          <td>{a.get("rule_name","")}</td>
-          <td><span class="sev-badge" style="background:{color}">{sev.upper()}</span></td>
-          <td class="mono" style="font-size:0.8em;color:#94a3b8">{a.get("mitre_technique","")}</td>
+          <td><code>{rule_id}</code></td>
+          <td>{rule_name}</td>
+          <td><span class="sev-badge" style="background:{color}">{_e(sev.upper())}</span></td>
+          <td class="mono" style="font-size:0.8em;color:#94a3b8">{technique}</td>
           <td style="font-size:0.82em;color:#cbd5e1">{fields_text}</td>
         </tr>"""
 
@@ -216,7 +225,8 @@ def generate_html_report(
 
     The report includes: a summary stats bar, per-incident cards with alert
     timelines and ATT&CK tactic coverage, and a full flat alert table at the
-    bottom. All styling is inlined — no external dependencies.
+    bottom. All styling is inlined — no external dependencies. All user-
+    controlled field values are HTML-escaped before insertion.
 
     Args:
         incidents: List of incident dicts from score_incidents().
@@ -239,16 +249,21 @@ def generate_html_report(
     for a in all_alerts:
         sev = a.get("severity", "low")
         color = _sev_color(sev)
-        ts = a.get("timestamp", "")[:19].replace("T", " ")
+        ts = _e(a.get("timestamp", "")[:19].replace("T", " "))
+        rule_id = _e(a.get("rule_id", ""))
+        rule_name = _e(a.get("rule_name", ""))
+        technique = _e(a.get("mitre_technique", ""))
+        tactic = _e(a.get("mitre_tactic", ""))
+        computer = _e(a.get("computer", ""))
         flat_rows += f"""
         <tr>
           <td class="mono" style="white-space:nowrap">{ts}</td>
-          <td><code>{a.get("rule_id","")}</code></td>
-          <td>{a.get("rule_name","")}</td>
-          <td><span class="sev-badge" style="background:{color}">{sev.upper()}</span></td>
-          <td class="mono" style="font-size:0.82em">{a.get("mitre_technique","")}</td>
-          <td style="font-size:0.82em">{a.get("mitre_tactic","")}</td>
-          <td style="font-size:0.82em">{a.get("computer","")}</td>
+          <td><code>{rule_id}</code></td>
+          <td>{rule_name}</td>
+          <td><span class="sev-badge" style="background:{color}">{_e(sev.upper())}</span></td>
+          <td class="mono" style="font-size:0.82em">{technique}</td>
+          <td style="font-size:0.82em">{tactic}</td>
+          <td style="font-size:0.82em">{computer}</td>
         </tr>"""
 
     no_incidents_msg = ""
@@ -258,12 +273,13 @@ def generate_html_report(
             "No correlated incidents detected in this run.</p>"
         )
 
+    html_title = _e(title)
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{title}</title>
+  <title>{html_title}</title>
   <style>
     *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
@@ -339,7 +355,7 @@ def generate_html_report(
 <body>
   <div class="topbar">
     <div>
-      <div class="topbar-title">&#9889; {title}</div>
+      <div class="topbar-title">&#9889; {html_title}</div>
     </div>
     <div class="topbar-sub">Generated {generated_at}</div>
   </div>

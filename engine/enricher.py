@@ -5,11 +5,13 @@ logger = logging.getLogger(__name__)
 
 def enrich_event(event: dict, all_events: list[dict], max_depth: int = 3) -> dict:
     """
-    Add process tree ancestry to an event dict by walking the ParentProcessId chain.
+    Add process tree ancestry and suspicious-parent flag to an event dict.
 
     Builds a pid->event lookup from all_events, then climbs the parent chain
     up to max_depth levels, collecting image name and command line at each level.
-    A copy of the event is returned so the original is never mutated.
+    Also calls flag_suspicious_parent() and stores the result as 'suspicious_parent'
+    so downstream rules and the alert pipeline can reference it without an
+    additional call. A copy of the event is returned so the original is never mutated.
 
     Args:
         event: The event dict to enrich. Must contain 'ProcessId' and
@@ -18,12 +20,15 @@ def enrich_event(event: dict, all_events: list[dict], max_depth: int = 3) -> dic
         max_depth: Maximum number of parent levels to walk. Defaults to 3.
 
     Returns:
-        A new event dict with an 'ancestors' key containing a list of
-        {'pid', 'image', 'command_line'} dicts ordered from immediate
-        parent outward. Empty list if ancestry cannot be resolved.
+        A new event dict with:
+          - 'ancestors': list of {'pid', 'image', 'command_line'} dicts ordered
+            from immediate parent outward. Empty list if ancestry cannot be resolved.
+          - 'suspicious_parent': bool — True if the parent-child process pair
+            matches a known-suspicious pattern (e.g. Word spawning PowerShell).
     """
     event = dict(event)  # avoid mutating the caller's dict
     event["ancestors"] = []
+    event["suspicious_parent"] = flag_suspicious_parent(event)
 
     if not event.get("ProcessId"):
         return event

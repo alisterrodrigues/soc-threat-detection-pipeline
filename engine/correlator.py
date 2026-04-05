@@ -120,7 +120,11 @@ def correlate_alerts(
     groups.append(current_group)
 
     incidents = []
-    for i, group in enumerate(groups):
+    # Use a separate counter so IDs are sequential across emitted incidents only.
+    # Iterating with enumerate(groups) would skip numbers for filtered-out
+    # singleton groups, producing gaps like INC-003 appearing before INC-001.
+    incident_counter = 1
+    for group in groups:
         if len(group) < min_alerts:
             continue
 
@@ -149,7 +153,7 @@ def correlate_alerts(
         ]
 
         incidents.append({
-            "incident_id": f"INC-{i + 1:03d}",
+            "incident_id": f"INC-{incident_counter:03d}",
             "computer": group[0].get("computer", ""),
             "alerts": group,
             "tactics": tactics,
@@ -160,6 +164,7 @@ def correlate_alerts(
             "kill_chains": matched_chains,
             "alert_count": len(group),
         })
+        incident_counter += 1
 
     logger.info(f"Correlation complete: {len(alerts)} alerts → {len(incidents)} incidents")
     return incidents

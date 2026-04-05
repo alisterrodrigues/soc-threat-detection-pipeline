@@ -7,6 +7,7 @@ This directory contains YAML-format detection rules evaluated by the pipeline en
 | `process_creation.yaml` | 1 | Process launches, LOLBin abuse, encoded commands |
 | `network_connection.yaml` | 3 | Suspicious outbound connections, C2 patterns |
 | `registry_modification.yaml` | 13 | Persistence, defense evasion, privilege escalation |
+| `process_access.yaml` | 10 | LSASS credential access, suspicious process handle access |
 
 ## Adding a Rule
 

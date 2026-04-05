@@ -76,8 +76,8 @@ rules:
     tuning_tag: "whoami_exec"
 
   - id: "PROC-005"
-    name: "Certutil Used for File Download or Encoding"
-    description: "Detects certutil.exe invoked with -urlcache, -split, -decode, or -encode flags — frequently abused to download or obfuscate payloads"
+    name: "Certutil Used for File Download or Decoding"
+    description: "Detects certutil.exe invoked with -urlcache or -split flags (T1105: Ingress Tool Transfer) or -decode/-encode flags (T1140: Deobfuscate/Decode Files). Both are frequently abused LOLBin patterns for payload staging."
     severity: high
     mitre_technique: "T1105"
     mitre_tactic: "Command and Control"
@@ -92,7 +92,7 @@ rules:
         value: "(-urlcache|-split|-decode|-encode)"
         case_insensitive: true
     logic: AND
-    false_positive_notes: "Certutil has legitimate certificate management uses. Flag only when download or encoding flags appear."
+    false_positive_notes: "Certutil has legitimate certificate management uses. Flag only when download or decoding flags appear. -decode/-encode usage maps to T1140 and should be correlated with other staging activity."
     tuning_tag: "certutil_lolbin"
 
   - id: "PROC-006"

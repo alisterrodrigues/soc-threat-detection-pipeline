@@ -44,6 +44,21 @@ def _e(value) -> str:
     return html.escape(str(value), quote=True)
 
 
+def _short_ts(ts: str) -> str:
+    """
+    Return only the time portion of an ISO timestamp for compact table display.
+
+    Input:  '2026-04-03T14:22:10'
+    Output: '14:22:10'
+
+    Keeps table timestamp columns narrow while preserving enough precision
+    for analysts to read event sequencing within a single-day incident.
+    """
+    clean = ts[:19].replace("T", " ")
+    parts = clean.split(" ")
+    return parts[1] if len(parts) == 2 else clean
+
+
 def _sev_color(severity: str) -> str:
     """Return the hex color for a given severity string."""
     return SEVERITY_COLORS.get(severity.lower(), "#64748b")
@@ -80,8 +95,8 @@ def _render_incident_card(incident: dict) -> str:
     alert_count = incident.get("alert_count", 0)
     tactics = incident.get("tactics", [])
     kill_chains = incident.get("kill_chains", [])
-    first_seen = _e(incident.get("first_seen", "")[:19].replace("T", " "))
-    last_seen = _e(incident.get("last_seen", "")[:19].replace("T", " "))
+    first_seen = _e(_short_ts(incident.get("first_seen", "")))
+    last_seen = _e(_short_ts(incident.get("last_seen", "")))
 
     if score >= 80:
         score_color = "#ef4444"
@@ -106,7 +121,7 @@ def _render_incident_card(incident: dict) -> str:
     for a in incident.get("alerts", []):
         sev = a.get("severity", "low")
         color = _sev_color(sev)
-        ts = _e(a.get("timestamp", "")[:19].replace("T", " "))
+        ts = _e(_short_ts(a.get("timestamp", "")))
         rule_id = _e(a.get("rule_id", ""))
         rule_name = _e(a.get("rule_name", ""))
         technique = _e(a.get("mitre_technique", ""))
@@ -117,8 +132,8 @@ def _render_incident_card(incident: dict) -> str:
             fields_text = ""
         alert_rows += f"""
         <tr>
-          <td class="mono" style="white-space:nowrap">{ts}</td>
-          <td><code>{rule_id}</code></td>
+          <td class="mono ts-col">{ts}</td>
+          <td class="ruleid-col"><code>{rule_id}</code></td>
           <td>{rule_name}</td>
           <td><span class="sev-badge" style="background:{color}">{_e(sev.upper())}</span></td>
           <td class="mono" style="font-size:0.8em;color:#94a3b8">{technique}</td>
@@ -132,7 +147,7 @@ def _render_incident_card(incident: dict) -> str:
           <span class="incident-id">{inc_id}</span>
           <span class="host-tag">{computer}</span>
         </div>
-        <div class="score-badge" style="background:{score_color}">{score}<span style="font-size:0.55em;opacity:0.8">/100</span></div>
+        <div class="score-badge" style="background:{score_color}">{score}<span class="score-denom">/100</span></div>
       </div>
 
       <div class="meta-grid">
@@ -153,8 +168,12 @@ def _render_incident_card(incident: dict) -> str:
         <table class="alert-table">
           <thead>
             <tr>
-              <th>Timestamp</th><th>Rule ID</th><th>Rule Name</th>
-              <th>Severity</th><th>Technique</th><th>Matched Fields</th>
+              <th class="ts-col">Time</th>
+              <th class="ruleid-col">Rule ID</th>
+              <th>Rule Name</th>
+              <th>Severity</th>
+              <th>Technique</th>
+              <th>Matched Fields</th>
             </tr>
           </thead>
           <tbody>{alert_rows}</tbody>
@@ -166,9 +185,6 @@ def _render_incident_card(incident: dict) -> str:
 def _render_summary_bar(stats: dict, incident_count: int) -> str:
     """
     Render the top-level run-summary stats bar.
-
-    Displays total alert count, per-severity breakdowns, and incident count
-    as a row of stat boxes with color-coded numbers.
 
     Args:
         stats: Aggregate stats dict from AlertStore.get_stats().
@@ -186,30 +202,12 @@ def _render_summary_bar(stats: dict, incident_count: int) -> str:
 
     return f"""
     <div class="summary-bar">
-      <div class="stat-box">
-        <div class="stat-num">{total}</div>
-        <div class="stat-label">Total Alerts</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" style="color:#ef4444">{critical}</div>
-        <div class="stat-label">Critical</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" style="color:#f97316">{high}</div>
-        <div class="stat-label">High</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" style="color:#eab308">{medium}</div>
-        <div class="stat-label">Medium</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" style="color:#06b6d4">{low}</div>
-        <div class="stat-label">Low</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" style="color:#8b5cf6">{incident_count}</div>
-        <div class="stat-label">Incidents</div>
-      </div>
+      <div class="stat-box"><div class="stat-num">{total}</div><div class="stat-label">Total Alerts</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:#ef4444">{critical}</div><div class="stat-label">Critical</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:#f97316">{high}</div><div class="stat-label">High</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:#eab308">{medium}</div><div class="stat-label">Medium</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:#06b6d4">{low}</div><div class="stat-label">Low</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:#8b5cf6">{incident_count}</div><div class="stat-label">Incidents</div></div>
     </div>"""
 
 
@@ -237,9 +235,6 @@ def generate_html_report(
 
     Returns:
         The output_path string (for logging by the caller).
-
-    Raises:
-        Does not raise — logs a warning and returns the path on write failure.
     """
     generated_at = _now_utc()
     incident_cards = "\n".join(_render_incident_card(inc) for inc in incidents)
@@ -249,7 +244,7 @@ def generate_html_report(
     for a in all_alerts:
         sev = a.get("severity", "low")
         color = _sev_color(sev)
-        ts = _e(a.get("timestamp", "")[:19].replace("T", " "))
+        ts = _e(_short_ts(a.get("timestamp", "")))
         rule_id = _e(a.get("rule_id", ""))
         rule_name = _e(a.get("rule_name", ""))
         technique = _e(a.get("mitre_technique", ""))
@@ -257,8 +252,8 @@ def generate_html_report(
         computer = _e(a.get("computer", ""))
         flat_rows += f"""
         <tr>
-          <td class="mono" style="white-space:nowrap">{ts}</td>
-          <td><code>{rule_id}</code></td>
+          <td class="mono ts-col">{ts}</td>
+          <td class="ruleid-col"><code>{rule_id}</code></td>
           <td>{rule_name}</td>
           <td><span class="sev-badge" style="background:{color}">{_e(sev.upper())}</span></td>
           <td class="mono" style="font-size:0.82em">{technique}</td>
@@ -297,9 +292,7 @@ def generate_html_report(
       font-size: 0.75em; font-weight: 600; text-transform: uppercase;
       letter-spacing: 0.08em; color: #64748b; margin-bottom: 16px; margin-top: 36px;
     }}
-    .summary-bar {{
-      display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px;
-    }}
+    .summary-bar {{ display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }}
     .stat-box {{
       background: #1e293b; border: 1px solid #334155; border-radius: 10px;
       padding: 16px 24px; flex: 1; min-width: 100px; text-align: center;
@@ -319,10 +312,11 @@ def generate_html_report(
       padding: 3px 10px; font-size: 0.82em; color: #94a3b8; font-family: monospace;
     }}
     .score-badge {{
-      font-size: 1.8em; font-weight: 800; border-radius: 50%; width: 64px; height: 64px;
+      font-size: 1.3em; font-weight: 800; border-radius: 50%; width: 72px; height: 72px;
       display: flex; align-items: center; justify-content: center; color: white;
-      flex-shrink: 0; letter-spacing: -0.03em;
+      flex-shrink: 0; letter-spacing: -0.03em; flex-direction: column;
     }}
+    .score-denom {{ font-size: 0.45em; opacity: 0.7; margin-top: 1px; }}
     .meta-grid {{ display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }}
     .meta-item {{
       background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 16px;
@@ -346,17 +340,17 @@ def generate_html_report(
     .alert-table tbody tr {{ border-top: 1px solid #1e293b; }}
     .alert-table tbody tr:hover {{ background: #162032; }}
     .alert-table td {{ padding: 9px 14px; vertical-align: top; color: #cbd5e1; }}
+    .ts-col    {{ width: 72px; min-width: 72px; white-space: nowrap; }}
+    .ruleid-col {{ width: 90px; min-width: 90px; white-space: nowrap; }}
     .sev-badge {{ border-radius: 4px; padding: 2px 8px; font-size: 0.75em; font-weight: 700; color: white; white-space: nowrap; }}
     .mono {{ font-family: "SF Mono", "Fira Code", "Consolas", monospace; }}
-    code {{ background: #0f172a; border: 1px solid #334155; border-radius: 4px; padding: 1px 6px; font-size: 0.88em; color: #7dd3fc; }}
+    code {{ background: #0f172a; border: 1px solid #334155; border-radius: 4px; padding: 1px 6px; font-size: 0.88em; color: #7dd3fc; white-space: nowrap; }}
     .flat-section {{ margin-top: 48px; }}
   </style>
 </head>
 <body>
   <div class="topbar">
-    <div>
-      <div class="topbar-title">&#9889; {html_title}</div>
-    </div>
+    <div><div class="topbar-title">&#9889; {html_title}</div></div>
     <div class="topbar-sub">Generated {generated_at}</div>
   </div>
 
@@ -374,8 +368,13 @@ def generate_html_report(
         <table class="alert-table">
           <thead>
             <tr>
-              <th>Timestamp</th><th>Rule ID</th><th>Rule Name</th>
-              <th>Severity</th><th>Technique</th><th>Tactic</th><th>Host</th>
+              <th class="ts-col">Time</th>
+              <th class="ruleid-col">Rule ID</th>
+              <th>Rule Name</th>
+              <th>Severity</th>
+              <th>Technique</th>
+              <th>Tactic</th>
+              <th>Host</th>
             </tr>
           </thead>
           <tbody>{flat_rows}</tbody>

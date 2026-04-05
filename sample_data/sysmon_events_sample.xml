@@ -61,7 +61,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:22:15.234567800Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:22:48.234567800Z"/>
       <EventRecordID>1002</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -69,7 +69,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:22:15.234</Data>
+      <Data Name="UtcTime">2026-04-03 14:22:48.234</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111102}</Data>
       <Data Name="ProcessId">5120</Data>
       <Data Name="Image">C:\Windows\System32\cmd.exe</Data>
@@ -104,7 +104,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:22:20.345678900Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:23:15.345678900Z"/>
       <EventRecordID>1003</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -112,7 +112,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:22:20.345</Data>
+      <Data Name="UtcTime">2026-04-03 14:23:15.345</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111103}</Data>
       <Data Name="ProcessId">6044</Data>
       <Data Name="Image">C:\Windows\System32\net.exe</Data>
@@ -147,7 +147,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:22:22.456789100Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:23:42.456789100Z"/>
       <EventRecordID>1004</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -155,7 +155,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:22:22.456</Data>
+      <Data Name="UtcTime">2026-04-03 14:23:42.456</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111104}</Data>
       <Data Name="ProcessId">6200</Data>
       <Data Name="Image">C:\Windows\System32\whoami.exe</Data>
@@ -190,7 +190,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:22:30.567890200Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:24:18.567890200Z"/>
       <EventRecordID>1005</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -198,7 +198,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:22:30.567</Data>
+      <Data Name="UtcTime">2026-04-03 14:24:18.567</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111105}</Data>
       <Data Name="ProcessId">6800</Data>
       <Data Name="Image">C:\Windows\System32\certutil.exe</Data>
@@ -233,7 +233,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:22:35.678901300Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:25:03.678901300Z"/>
       <EventRecordID>1006</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -241,7 +241,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:22:35.678</Data>
+      <Data Name="UtcTime">2026-04-03 14:25:03.678</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111106}</Data>
       <Data Name="ProcessId">7040</Data>
       <Data Name="Image">C:\Windows\System32\mshta.exe</Data>
@@ -276,7 +276,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:22:40.789012400Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:25:30.789012400Z"/>
       <EventRecordID>1007</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -284,7 +284,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:22:40.789</Data>
+      <Data Name="UtcTime">2026-04-03 14:25:30.789</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111107}</Data>
       <Data Name="ProcessId">7200</Data>
       <Data Name="Image">C:\Program Files\Google\Chrome\Application\chrome.exe</Data>
@@ -319,7 +319,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:22:45.890123500Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:25:55.890123500Z"/>
       <EventRecordID>1008</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -327,7 +327,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:22:45.890</Data>
+      <Data Name="UtcTime">2026-04-03 14:25:55.890</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111108}</Data>
       <Data Name="ProcessId">892</Data>
       <Data Name="Image">C:\Windows\System32\svchost.exe</Data>
@@ -362,7 +362,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:22:50.001234500Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:26:20.001234500Z"/>
       <EventRecordID>1009</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -370,7 +370,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:22:50.001</Data>
+      <Data Name="UtcTime">2026-04-03 14:26:20.001</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111109}</Data>
       <Data Name="ProcessId">9100</Data>
       <Data Name="Image">C:\Windows\System32\notepad.exe</Data>
@@ -409,7 +409,7 @@
       <Task>3</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:23:00.123456700Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:26:55.123456700Z"/>
       <EventRecordID>1010</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -417,7 +417,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:23:00.123</Data>
+      <Data Name="UtcTime">2026-04-03 14:26:55.123</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111107}</Data>
       <Data Name="ProcessId">7200</Data>
       <Data Name="Image">C:\Program Files\Google\Chrome\Application\chrome.exe</Data>
@@ -447,7 +447,7 @@
       <Task>3</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:23:05.234567800Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:27:30.234567800Z"/>
       <EventRecordID>1011</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -455,7 +455,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:23:05.234</Data>
+      <Data Name="UtcTime">2026-04-03 14:27:30.234</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111120}</Data>
       <Data Name="ProcessId">8100</Data>
       <Data Name="Image">C:\Windows\System32\wscript.exe</Data>
@@ -485,7 +485,7 @@
       <Task>3</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:23:07.890123400Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:28:10.890123400Z"/>
       <EventRecordID>1012</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -493,7 +493,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:23:07.890</Data>
+      <Data Name="UtcTime">2026-04-03 14:28:10.890</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111121}</Data>
       <Data Name="ProcessId">8200</Data>
       <Data Name="Image">C:\Windows\System32\cscript.exe</Data>
@@ -523,7 +523,7 @@
       <Task>3</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:23:10.345678900Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:28:45.345678900Z"/>
       <EventRecordID>1013</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -531,7 +531,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:23:10.345</Data>
+      <Data Name="UtcTime">2026-04-03 14:28:45.345</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111107}</Data>
       <Data Name="ProcessId">7200</Data>
       <Data Name="Image">C:\Program Files\Google\Chrome\Application\chrome.exe</Data>
@@ -561,7 +561,7 @@
       <Task>3</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:23:15.456789100Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:29:20.456789100Z"/>
       <EventRecordID>1014</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -569,7 +569,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:23:15.456</Data>
+      <Data Name="UtcTime">2026-04-03 14:29:20.456</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111108}</Data>
       <Data Name="ProcessId">892</Data>
       <Data Name="Image">C:\Windows\System32\svchost.exe</Data>
@@ -603,7 +603,7 @@
       <Task>10</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:23:20.567890200Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:29:58.567890200Z"/>
       <EventRecordID>1015</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -611,7 +611,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:23:20.567</Data>
+      <Data Name="UtcTime">2026-04-03 14:29:58.567</Data>
       <Data Name="SourceProcessGUID">{11111111-1111-1111-1111-111111111101}</Data>
       <Data Name="SourceProcessId">4892</Data>
       <Data Name="SourceThreadId">5012</Data>
@@ -634,7 +634,7 @@
       <Task>10</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:23:25.678901300Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:30:25.678901300Z"/>
       <EventRecordID>1016</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -642,7 +642,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:23:25.678</Data>
+      <Data Name="UtcTime">2026-04-03 14:30:25.678</Data>
       <Data Name="SourceProcessGUID">{11111111-1111-1111-1111-111111111107}</Data>
       <Data Name="SourceProcessId">7200</Data>
       <Data Name="SourceThreadId">7300</Data>
@@ -669,7 +669,7 @@
       <Task>13</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:23:30.789012400Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:31:05.789012400Z"/>
       <EventRecordID>1017</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -678,7 +678,7 @@
     <EventData>
       <Data Name="RuleName">-</Data>
       <Data Name="EventType">SetValue</Data>
-      <Data Name="UtcTime">2026-04-03 14:23:30.789</Data>
+      <Data Name="UtcTime">2026-04-03 14:31:05.789</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111106}</Data>
       <Data Name="ProcessId">7040</Data>
       <Data Name="Image">C:\Windows\System32\mshta.exe</Data>
@@ -698,7 +698,7 @@
       <Task>13</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:23:35.890123500Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:31:48.890123500Z"/>
       <EventRecordID>1018</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -707,7 +707,7 @@
     <EventData>
       <Data Name="RuleName">-</Data>
       <Data Name="EventType">SetValue</Data>
-      <Data Name="UtcTime">2026-04-03 14:23:35.890</Data>
+      <Data Name="UtcTime">2026-04-03 14:31:48.890</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111101}</Data>
       <Data Name="ProcessId">4892</Data>
       <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
@@ -727,7 +727,7 @@
       <Task>13</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:23:40.901234600Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:32:25.901234600Z"/>
       <EventRecordID>1019</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -736,7 +736,7 @@
     <EventData>
       <Data Name="RuleName">-</Data>
       <Data Name="EventType">SetValue</Data>
-      <Data Name="UtcTime">2026-04-03 14:23:40.901</Data>
+      <Data Name="UtcTime">2026-04-03 14:32:25.901</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111101}</Data>
       <Data Name="ProcessId">4892</Data>
       <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
@@ -756,7 +756,7 @@
       <Task>13</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:23:45.012345600Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:32:58.012345600Z"/>
       <EventRecordID>1020</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-01</Computer>
@@ -765,7 +765,7 @@
     <EventData>
       <Data Name="RuleName">-</Data>
       <Data Name="EventType">SetValue</Data>
-      <Data Name="UtcTime">2026-04-03 14:23:45.012</Data>
+      <Data Name="UtcTime">2026-04-03 14:32:58.012</Data>
       <Data Name="ProcessGuid">{11111111-1111-1111-1111-111111111108}</Data>
       <Data Name="ProcessId">892</Data>
       <Data Name="Image">C:\Windows\System32\svchost.exe</Data>
@@ -792,7 +792,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:30:05.112233400Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:45:12.112233400Z"/>
       <EventRecordID>2001</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-02</Computer>
@@ -800,7 +800,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:30:05.112</Data>
+      <Data Name="UtcTime">2026-04-03 14:45:12.112</Data>
       <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222201}</Data>
       <Data Name="ProcessId">3344</Data>
       <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
@@ -835,7 +835,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:30:18.334455600Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:45:55.334455600Z"/>
       <EventRecordID>2002</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-02</Computer>
@@ -843,7 +843,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:30:18.334</Data>
+      <Data Name="UtcTime">2026-04-03 14:45:55.334</Data>
       <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222202}</Data>
       <Data Name="ProcessId">3456</Data>
       <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
@@ -878,7 +878,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:30:25.556677800Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:46:38.556677800Z"/>
       <EventRecordID>2003</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-02</Computer>
@@ -886,7 +886,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:30:25.556</Data>
+      <Data Name="UtcTime">2026-04-03 14:46:38.556</Data>
       <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222203}</Data>
       <Data Name="ProcessId">3600</Data>
       <Data Name="Image">C:\Windows\System32\net.exe</Data>
@@ -921,7 +921,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:30:28.778899000Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:47:10.778899000Z"/>
       <EventRecordID>2004</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-02</Computer>
@@ -929,7 +929,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:30:28.778</Data>
+      <Data Name="UtcTime">2026-04-03 14:47:10.778</Data>
       <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222204}</Data>
       <Data Name="ProcessId">3700</Data>
       <Data Name="Image">C:\Windows\System32\whoami.exe</Data>
@@ -964,7 +964,7 @@
       <Task>1</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:30:32.001122300Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:47:44.001122300Z"/>
       <EventRecordID>2005</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-02</Computer>
@@ -972,7 +972,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:30:32.001</Data>
+      <Data Name="UtcTime">2026-04-03 14:47:44.001</Data>
       <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222205}</Data>
       <Data Name="ProcessId">4100</Data>
       <Data Name="Image">C:\Windows\System32\calc.exe</Data>
@@ -1011,7 +1011,7 @@
       <Task>3</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:30:40.223344500Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:48:20.223344500Z"/>
       <EventRecordID>2006</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-02</Computer>
@@ -1019,7 +1019,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:30:40.223</Data>
+      <Data Name="UtcTime">2026-04-03 14:48:20.223</Data>
       <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222201}</Data>
       <Data Name="ProcessId">3344</Data>
       <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
@@ -1049,7 +1049,7 @@
       <Task>3</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:30:45.445566700Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:48:55.445566700Z"/>
       <EventRecordID>2007</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-02</Computer>
@@ -1057,7 +1057,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:30:45.445</Data>
+      <Data Name="UtcTime">2026-04-03 14:48:55.445</Data>
       <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222210}</Data>
       <Data Name="ProcessId">4400</Data>
       <Data Name="Image">C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe</Data>
@@ -1091,7 +1091,7 @@
       <Task>13</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:30:50.667788900Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:49:35.667788900Z"/>
       <EventRecordID>2008</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-02</Computer>
@@ -1100,7 +1100,7 @@
     <EventData>
       <Data Name="RuleName">-</Data>
       <Data Name="EventType">SetValue</Data>
-      <Data Name="UtcTime">2026-04-03 14:30:50.667</Data>
+      <Data Name="UtcTime">2026-04-03 14:49:35.667</Data>
       <Data Name="ProcessGuid">{22222222-2222-2222-2222-222222222202}</Data>
       <Data Name="ProcessId">3456</Data>
       <Data Name="Image">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
@@ -1124,7 +1124,7 @@
       <Task>10</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:30:58.889900100Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:50:18.889900100Z"/>
       <EventRecordID>2009</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-02</Computer>
@@ -1132,7 +1132,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:30:58.889</Data>
+      <Data Name="UtcTime">2026-04-03 14:50:18.889</Data>
       <Data Name="SourceProcessGUID">{22222222-2222-2222-2222-222222222202}</Data>
       <Data Name="SourceProcessId">3456</Data>
       <Data Name="SourceThreadId">3800</Data>
@@ -1155,7 +1155,7 @@
       <Task>10</Task>
       <Opcode>0</Opcode>
       <Keywords>0x8000000000000000</Keywords>
-      <TimeCreated SystemTime="2026-04-03T14:31:02.001234500Z"/>
+      <TimeCreated SystemTime="2026-04-03T14:50:52.001234500Z"/>
       <EventRecordID>2010</EventRecordID>
       <Channel>Microsoft-Windows-Sysmon/Operational</Channel>
       <Computer>WORKSTATION-02</Computer>
@@ -1163,7 +1163,7 @@
     </System>
     <EventData>
       <Data Name="RuleName">-</Data>
-      <Data Name="UtcTime">2026-04-03 14:31:02.001</Data>
+      <Data Name="UtcTime">2026-04-03 14:50:52.001</Data>
       <Data Name="SourceProcessGUID">{22222222-2222-2222-2222-222222222300}</Data>
       <Data Name="SourceProcessId">9900</Data>
       <Data Name="SourceThreadId">9910</Data>

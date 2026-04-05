@@ -1,7 +1,7 @@
 rules:
   - id: "PA-001"
     name: "LSASS Memory Access"
-    description: "Detects any process opening a handle to lsass.exe — primary indicator of credential dumping tools such as Mimikatz, ProcDump, and similar"
+    description: "Detects any process opening a handle to lsass.exe — a broad but high-signal indicator of credential dumping activity. Use as a hunting rule; tune with SourceImage allowlists in production."
     severity: critical
     mitre_technique: "T1003.001"
     mitre_tactic: "Credential Access"
@@ -16,8 +16,8 @@ rules:
     tuning_tag: "lsass_access"
 
   - id: "PA-002"
-    name: "Suspicious Access Mask on LSASS"
-    description: "Detects high-privilege or Mimikatz-specific access masks requested against lsass.exe — 0x1010, 0x1410, and 0x1fffff are characteristic of credential dumping tools"
+    name: "High-Privilege Access Mask on LSASS"
+    description: "Detects access masks commonly seen in credential dumping tools (0x1010, 0x1410, 0x1fffff, 0x143a) requested against lsass.exe. These masks grant rights sufficient to read process memory."
     severity: critical
     mitre_technique: "T1003.001"
     mitre_tactic: "Credential Access"
@@ -29,7 +29,7 @@ rules:
         case_insensitive: true
       - field: "GrantedAccess"
         operator: regex
-        value: "0x(1010|1410|1fffff|143a)"
+        value: "^0x(1010|1410|1fffff|143a)$"
         case_insensitive: true
     logic: AND
     false_positive_notes: "Some legitimate security products use these masks. Correlate SourceImage against a known-good allowlist before escalating."

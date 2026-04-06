@@ -11,7 +11,7 @@ def enrich_event(event: dict, all_events: list[dict], max_depth: int = 3) -> dic
     up to max_depth levels, collecting image name and command line at each level.
     Also calls flag_suspicious_parent() and stores the result as 'suspicious_parent'
     so downstream rules and the alert pipeline can reference it without an
-    additional call. A copy of the event is returned so the original is never mutated.
+    additional call. Returns a copy of the event; the caller's dict is not modified.
 
     Args:
         event: The event dict to enrich. Must contain 'ProcessId' and

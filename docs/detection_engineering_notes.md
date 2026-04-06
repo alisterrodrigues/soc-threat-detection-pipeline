@@ -1,6 +1,6 @@
 # Detection Engineering Notes
 
-This document outlines the key design decisions, tradeoffs, and rationale behind the pipeline’s detection logic, correlation algorithm, and risk scoring model. It’s intended to help reviewers quickly understand how the system works and why certain choices were made.
+This document outlines the design decisions, tradeoffs, and rationale behind the pipeline’s detection logic, correlation algorithm, and risk scoring model. It’s intended to give contributors context on how the system works and why certain choices were made.
 
 ---
 

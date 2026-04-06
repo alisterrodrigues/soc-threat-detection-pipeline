@@ -14,9 +14,9 @@ A Python-based behavioral threat detection engine for Windows Sysmon logs. It in
 
 ---
 
-## Why this project
+## What it covers
 
-Most detection projects stop at "match a string, print an alert." This one models the full SOC workflow:
+The pipeline models the complete SOC analyst workflow end-to-end:
 
 - **Detection** — 15 behavioral rules across process creation, network connections, registry modifications, and process access events, each mapped to a specific MITRE ATT&CK technique with documented false positive guidance
 - **Correlation** — alerts on the same host within a configurable time window are grouped into incidents, annotated with kill chain coverage, and risk-scored 0–100

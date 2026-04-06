@@ -36,8 +36,8 @@ class AlertStore:
         """
         Initialize the AlertStore and create the alerts table if needed.
 
-        Creates any missing parent directories for the database file so
-        the pipeline can run without manual directory setup.
+        Missing parent directories for the database file are created
+        automatically.
 
         Args:
             db_path: File system path where the SQLite database should live.
@@ -159,8 +159,8 @@ class AlertStore:
         """
         Set the analyst verdict on an alert and attach optional free-text notes.
 
-        Only 'true_positive' and 'false_positive' are accepted dispositions.
-        Any other value is rejected without touching the database.
+        Accepted values are 'true_positive' and 'false_positive'. Returns False
+        immediately without writing to the database if an unrecognised value is given.
 
         Args:
             alert_id: The integer primary key of the alert to update.

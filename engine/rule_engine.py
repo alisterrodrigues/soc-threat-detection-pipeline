@@ -86,8 +86,8 @@ def _evaluate_conditions(event: dict, rule: dict) -> tuple[bool, dict]:
     Evaluate all conditions defined in a rule against a single event.
 
     Returns (False, {}) immediately if the rule has no conditions — an empty
-    condition list should never match, not match everything (which is what
-    Python's all([]) would do by default).
+    condition list would otherwise pass Python's all([]) check and fire on
+    every event.
 
     Applies AND or OR logic across all condition results. Collects the
     fields and values that individually triggered for inclusion in alerts.
